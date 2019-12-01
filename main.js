@@ -24,18 +24,15 @@ var svg = d3.select('#svg1');
 var svgWidth = 3000;
 var svgHeight = 700;
 
-var xHistScale;
-
 var padding = {t: 50, r: 50, b: 50, l: 50};
 
- var chartWidth = svgWidth - padding.l - padding.r;
- var chartHeight = svgHeight - padding.t - padding.b;
+var chartWidth = svgWidth - padding.l - padding.r;
+var chartHeight = svgHeight - padding.t - padding.b;
 
-//var chartWidth = 1100;
-//var chartHeight = 700;
+var xHistScale;
 
-
-var valueColors = ['#99d6ff', '#33adff','#008ae6','#005c99'];
+//wtf are these lines doing theyre not reverseing anything
+var valueColors = ['#fed825', '#ffa15a', '#ff6496', '#fe2bcc'];
 var reversedColors = valueColors.slice().reverse();
 
 var colorScale = d3.scaleQuantize()
@@ -46,20 +43,15 @@ var hist = svg.append('g')
             .attr('class', 'histogram')
             .attr("transform", function(d){ return 'translate(' + [padding.t, padding.l] + ')'; });
 
+            //TODO: probably change fonts too
 hist.append('text')
     .attr('class', 'hist_y_axis_label')
     .attr('transform', function(d) {return "translate("+[-30,450]+") " + "rotate(270)"})
     .text('Number of Colleges')
     .style('font-size', '15px')
-    .attr("font-family", "Trebuchet MS");;
+    .attr("font-family", "Trebuchet MS");
 
-hist.append('text')
-    .attr('class', 'hist_x_axis_label')
-    .attr('transform', function(d) {return "translate("+[200,650]+") " })
-    .text('Admission Rate (%)')
-    .style('font-size', '15px')
-    .attr("font-family", "Trebuchet MS");;
-
+//TODO: need to reformat this 
 hist.append('text')
     .attr('class', 'hist_title')
     .attr('transform', function(d) {return "translate("+[25,50]+") "})
@@ -79,9 +71,10 @@ hist.append('text')
 //     .attr("transform", function(d) {return 'translate(' + [100, 100]+')'; });
 
 var yHistScale = d3.scaleLinear()
-    .domain([0, 65])
+    .domain([0, 60])
     .range([chartHeight * .8, 0]);
 
+//TODO: need to rethink stuff with leged 
 var legendHist = ['50k+', '35k-50k', '$20k-35k', '$20k+'];
 // var legendTitle = ['Median Earnings 8 years After Entry'];
 
@@ -114,7 +107,7 @@ svg.append('g') // Append a g element for the scale
 d3.csv('./colleges.csv',
     function(d){
         // This callback formats each row of the data
-        console.log("I'm in the first csv function");
+        //console.log("I'm in the first csv function");
         return {
             name: d.Name,
             admission: +d['Admission Rate'],
@@ -130,10 +123,8 @@ d3.csv('./colleges.csv',
     },
 
     function(error, dataset){
-        console.log("I'm in the second csv function");
+        //console.log("I'm in the second csv function");
         if(error) {
-            // console.error('Error while loading ./colleges.csv dataset.');
-            // console.error(error);
             return;
         }
 
@@ -146,14 +137,22 @@ d3.csv('./colleges.csv',
             .attr('class', 'xHist_axis') // Use a class to css style the axes together
             .attr('transform', 'translate(50, 660)') // Position the axis
             .call(d3.axisBottom(xHistScale)); // Call the axis function
+
+        hist.append('text')
+            .attr('class', 'hist_x_axis_label')
+            .attr('transform', function(d) {return "translate("+[200,650]+") " })
+            .text('Average Cost ($)')
+            .style('font-size', '15px')
+            .attr("font-family", "Trebuchet MS");
         
         
         var sortedData = dataset.sort(function(a, b) {
             return b.salary - a.salary;
         })
         stats = dataset;
-        console.log(stats[0]);
+        //console.log(stats[0]);
 
+        //TODO: not sure if we need these max and min salaries 
         var maxSalary = d3.max(dataset, function(d){
             return d.salary;
         });
@@ -163,6 +162,8 @@ d3.csv('./colleges.csv',
         });
 
 
+        //TODO: 
+        //this isn't being used rn maybe we can use for some filtering
         var regions = d3.nest()
             .key(function(d) { return d.region; })
             .entries(dataset);
@@ -173,6 +174,8 @@ d3.csv('./colleges.csv',
           tempObj.selected = true;
           regionsArr.push(tempObj);
         });
+
+        //console.log("regionsArr: ", regionsArr)
 
 
         updateChart();
@@ -187,7 +190,7 @@ var arrayofrects = [];
 var counting = 0; 
 var dots; 
 function updateChart() {
-    console.log("I'm in updateChart");
+    //console.log("I'm in updateChart");
 
     var costRange;
     var ACTRange;
@@ -243,7 +246,11 @@ function updateChart() {
                 //console.log(d.name);
                 arrayofrects[counting] = d.name;
                 counting++;
-                return yHistScale(1.2 * i) + 70
+                //so rn the top square is abnormally larger
+                //than the rest of the ones in the histogram? 
+                //it becomes the same size if you do i * 1.2
+                //but then it extends past the y axis
+                return yHistScale(i) + 70
         })
         .attr("width", 10)
         .attr("height", 10)
@@ -270,9 +277,8 @@ function updateChart() {
     //              salary: d.salary
     //            };
     //   });
-
-
 }
+
 function color(d) {
   svg.selectAll(".plotEntry")
     .filter(function(e) {
@@ -292,10 +298,12 @@ function uncolor(d) {
     .style("opacity", 0.3);
 }
 
+//not sure if these two functions here are necessary
 
 d3.queue()
 .defer(d3.csv, 'colleges.csv', function(row) {
-    console.log("I'm in the queue and defer function");
+    
+    //console.log("I'm in the queue and defer function");
     return {
         name: row['Name'],
         control: row['Control'],
@@ -340,7 +348,7 @@ d3.queue()
 }).await(dotheGoodStuff);
 
 function dotheGoodStuff(error, dataset) {
-    console.log("I'm in the doGoodStuff function");
+    //console.log("I'm in the doGoodStuff function");
     if(error) {
         console.log("error");
         return;
