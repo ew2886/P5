@@ -21,3 +21,10 @@ path.domain {
 	stroke-width: 2px;
 	stroke: black;
 }
+.tooltip{
+	text-anchor: middle;
+	font-family: sans-serif;
+	font-size: 10px;
+	font-weight: bold;
+	fill:black; 
+  }

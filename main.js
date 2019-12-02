@@ -31,7 +31,8 @@ var chartHeight = svgHeight - padding.t - padding.b;
 
 var xHistScale;
 
-//wtf are these lines doing theyre not reverseing anything
+//why is this reversing here
+//also these colors really ugly lol i just chose a random palette 
 var valueColors = ['#fed825', '#ffa15a', '#ff6496', '#fe2bcc'];
 var reversedColors = valueColors.slice().reverse();
 
@@ -43,7 +44,7 @@ var hist = svg.append('g')
             .attr('class', 'histogram')
             .attr("transform", function(d){ return 'translate(' + [padding.t, padding.l] + ')'; });
 
-            //TODO: probably change fonts too
+//TODO: probably change fonts too
 hist.append('text')
     .attr('class', 'hist_y_axis_label')
     .attr('transform', function(d) {return "translate("+[-30,450]+") " + "rotate(270)"})
@@ -103,6 +104,15 @@ svg.append('g') // Append a g element for the scale
     .attr('class', 'yHist_axis') // Use a class to css style the axes together
     .attr('transform', 'translate(50, 180)') // Position the axis
     .call(d3.axisLeft(yHistScale)); // Call the axis function
+
+var tip = d3.tip()
+    .attr('class', 'd3-tip')
+    .offset([0, 0])
+    .html(function(d) {
+      return d["name"];
+    });
+
+svg.call(tip);
 
 d3.csv('./colleges.csv',
     function(d){
@@ -176,8 +186,6 @@ d3.csv('./colleges.csv',
         });
 
         //console.log("regionsArr: ", regionsArr)
-
-
         updateChart();
 
     });
@@ -213,8 +221,6 @@ function updateChart() {
         .data( function() {
             return bins; });
         
-    
-
     var dotBinsEnter = dotBins.enter()
         .append("g")
         .merge(dotBins).attr("class", "gBin");
@@ -223,6 +229,7 @@ function updateChart() {
     dotBinsEnter.attr("class", "gBin")
         .attr("transform", function(d){ return 'translate(' + [xHistScale(d.x0), padding.b] + ')'; });
 
+    //what is this doing tbh 
     dots = dotBinsEnter.selectAll(".dot")
         .data(d => d.map((p, i) => {
             return {idx: i,
@@ -241,7 +248,10 @@ function updateChart() {
     dotsEnter = dots.enter()
         .append("rect");
     
-    dotsEnter.attr("x", 0)
+    dotsEnter.attr("x", function(d, i) {
+            console.log(this);
+            return xHistScale(i) + 80//console.log(d);
+        })
         .attr("y", function(d, i) {
                 //console.log(d.name);
                 arrayofrects[counting] = d.name;
@@ -257,28 +267,27 @@ function updateChart() {
         .style("stroke", "white")
         .style("fill", function(d) {return colorScale(d['salary']); })
         .attr("name", function(d) { return d['name']})
-        .on('mouseover', function(d) {
-          //toolTip.show(d);
-          color(this);
-        })
-        .on('mouseout', function(d) {
-          //toolTip.hide(d);
-          uncolor(this);
+        .on("mouseover", function(d) {
+            color(this);
+            tip.show(d);
+            //console.log(d3.select(this).attr("x"));
+            // var delta = d.y1 - d.y0;
+            // var xPos = parseFloat(d3.select(this).attr("x"));
+            // var yPos = parseFloat(d3.select(this).attr("y"));
+            // var height = parseFloat(d3.select(this).attr("height"))
+            // svg.append("text")
+            //     .attr("x",xPos)
+            //     .attr("y",yPos +height/2)
+            //     .attr("class","tooltip")
+            //     .text("testing"); 
+        })					
+        .on("mouseout", function(d) {
+            tip.hide(d);
+            uncolor(this);	
         });
-    
-        //console.log(dots)
-    //dots.exit().remove();
-    //dotBins.exit().remove();
-
-    // var circles = plot.selectAll('.plotEntry')
-    //   .data(filteredStats, function(d) {
-    //     return { name:d['name'],
-    //              debt:d.debt,
-    //              salary: d.salary
-    //            };
-    //   });
 }
 
+//idk what these color functions are doing 
 function color(d) {
   svg.selectAll(".plotEntry")
     .filter(function(e) {
