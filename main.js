@@ -2,13 +2,13 @@ var data_set =[];
 var hello = [];
 var control = [];
 var locale = [];
-var white = [];
-var black = [];
-var hispanic = [];
-var asian = [];
-var americanIndian = [];
-var pacfic = [];
-var biracial = [];
+// var white = [];
+// var black = [];
+// var hispanic = [];
+// var asian = [];
+// var americanIndian = [];
+// var pacfic = [];
+// var biracial = [];
 var cost = [];
 var earnings = [];
 var debt = [];
@@ -32,20 +32,32 @@ var graphPlace;
 
 //why is this reversing here
 //also these colors really ugly lol i just chose a random palette 
-var valueColors = ['#fed825', '#ffa15a', '#ff6496', '#fe2bcc'];
+var valueColors = ['#FFFF02', '#FED825', '#FFA15A', '#FF6496',  '#EC02E2'];
 var reversedColors = valueColors.slice().reverse();
 
 //what's the domain here for?
 var colorScale = d3.scaleQuantize()
-      .domain([5000, 65000])
+      .domain([20000, 60000]) //15000, 65000
       .range(valueColors);
+
+    // thresholds   
+    // #FFFF02:  (2) [20000, 28000]
+    // #FED825:  (2) [28000, 36000]
+    // #FFA15A:  (2) [36000, 44000]
+    // #FF6496:  (2) [44000, 52000]
+    // #EC02E2:  (2) [52000, 60000]
+console.log("#FFFF02: ",colorScale.invertExtent("#FFFF02"));//returns [25, 37.5]
+console.log("#FED825: ",colorScale.invertExtent("#FED825"));//returns [25, 37.5]
+console.log("#FFA15A: ",colorScale.invertExtent("#FFA15A"));//returns [25, 37.5]
+console.log("#FF6496: ",colorScale.invertExtent("#FF6496"));//returns [25, 37.5]
+console.log("#EC02E2: ",colorScale.invertExtent("#EC02E2"));//returns [25, 37.5]
 
 // var plot = svg.append('g')
 //     .attr('class', 'plot')
 //     .attr("transform", function(d) {return 'translate(' + [100, 100]+')'; });
 
 //TODO: need to rethink stuff with leged 
-var legendHist = ['50k+', '35k-50k', '$20k-35k', '$20k+'];
+var legendHist = ['$52k+', '$44k-$52k', '$36k-$44k', '$28k-$36k', '< $28k'];
 var legendTitle = ['Median Earnings 8 years After Entry'];
 
 var tip = d3.tip()
@@ -388,7 +400,6 @@ function plotSingle(d) {
         .attr("y", y_new);
    
     })    
-   
 } 
 
 function restorePlot(d) {
