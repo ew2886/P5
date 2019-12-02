@@ -325,6 +325,12 @@ function updateChart() {
         .on("mouseover", function(d) {
             color(this);
             tip.show(d);
+            d3.select("#sName").text(d['name']);
+            d3.select("#sRegion").text(d['region']);
+            d3.select("#sAdmiss").text(d['admission']);
+            d3.select("#sACT").text(d['ACT']);
+            d3.select("#sSAT").text(d['SAT']);
+            d3.select("#sCost").text(d['cost']);
         })					
         .on("mouseout", function(d) {
             tip.hide(d);
