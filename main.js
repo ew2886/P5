@@ -1,6 +1,3 @@
-var width =500;
-var height= 500;
-
 var data_set =[];
 var hello = [];
 var control = [];
@@ -19,7 +16,6 @@ var pop = [];
 var colors = ["gray", '#996600', '#660066', "#003300", '#003366', '#C8C8C8', '#000000', '#680000']
 
 var svg = d3.select('#svg1');
- var slider = document.getElementById('svg1');
 
 var svgWidth = 3000;
 var svgHeight = 700;
@@ -30,6 +26,7 @@ var chartWidth = svgWidth - padding.l - padding.r;
 var chartHeight = svgHeight - padding.t - padding.b;
 
 var xHistScale;
+var yHistScale;
 var hist;
 
 //why is this reversing here
@@ -37,6 +34,7 @@ var hist;
 var valueColors = ['#fed825', '#ffa15a', '#ff6496', '#fe2bcc'];
 var reversedColors = valueColors.slice().reverse();
 
+//what's the domain here for?
 var colorScale = d3.scaleQuantize()
       .domain([5000, 65000])
       .range(valueColors);
@@ -45,18 +43,9 @@ var colorScale = d3.scaleQuantize()
 //     .attr('class', 'plot')
 //     .attr("transform", function(d) {return 'translate(' + [100, 100]+')'; });
 
-var yHistScale = d3.scaleLinear()
-    .domain([0, 60])
-    .range([chartHeight * .8, 0]);
-
 //TODO: need to rethink stuff with leged 
 var legendHist = ['50k+', '35k-50k', '$20k-35k', '$20k+'];
 var legendTitle = ['Median Earnings 8 years After Entry'];
-
-svg.append('g') // Append a g element for the scale
-    .attr('class', 'yHist_axis') // Use a class to css style the axes together
-    .attr('transform', 'translate(50, 180)') // Position the axis
-    .call(d3.axisLeft(yHistScale)); // Call the axis function
 
 var tip = d3.tip()
     .attr('class', 'd3-tip')
@@ -111,6 +100,15 @@ d3.csv('./colleges.csv',
             .attr("transform", function(d){ return 'translate(' + [padding.t, padding.l] + ')'; });
 
         ``//TODO: probably change fonts too
+        yHistScale = d3.scaleLinear()
+            .domain([0, 60])
+            .range([chartHeight * .8, 0]);
+
+        svg.append('g') // Append a g element for the scale
+            .attr('class', 'yHist_axis') // Use a class to css style the axes together
+            .attr('transform', 'translate(50, 180)') // Position the axis
+            .call(d3.axisLeft(yHistScale)); // Call the axis function
+
         hist.append('text')
             .attr('class', 'hist_y_axis_label')
             .attr('transform', function(d) {return "translate("+[-30,450]+") " + "rotate(270)"})
@@ -145,17 +143,15 @@ d3.csv('./colleges.csv',
             return b.salary - a.salary;
         })
         stats = dataset;
-        //console.log(stats[0]);
 
         //TODO: not sure if we need these max and min salaries 
-        var maxSalary = d3.max(dataset, function(d){
-            return d.salary;
-        });
+        // var maxSalary = d3.max(dataset, function(d){
+        //     return d.salary;
+        // });
 
-        var minSalary = d3.min(dataset, function(d){
-            return d.salary;
-        });
-
+        // var minSalary = d3.min(dataset, function(d){
+        //     return d.salary;
+        // });
 
         //TODO: 
         //this isn't being used rn maybe we can use for some filtering
@@ -171,7 +167,7 @@ d3.csv('./colleges.csv',
         });
 
         var legend = hist.selectAll(".legend")
-            .data(reversedColors).enter()
+            .data(valueColors.slice().reverse()).enter()
             .append("rect")
             .attr("fill", function (color){ return color; })
             .attr("x", 650)
@@ -179,11 +175,13 @@ d3.csv('./colleges.csv',
             .attr("width", 17)
             .attr("height", 17)
             .attr("class", function(d) {
+                //testing this
                 legendClassArray.push(d.replace(/\s/g, ''));
                 return "legend";
             })
             .attr("transform", 'translate(' +[-400, 150]+')')
             .on("mouseover", function() {
+                //makes cursor change
                 console.log("testing");
                 if (active_link === "0") d3.select(this).style("cursor", "pointer");
                 else {
@@ -193,7 +191,6 @@ d3.csv('./colleges.csv',
                 }
             })
             .on("click",function(d){        
-
                 if (active_link === "0") { //nothing selected, turn on this selection
                   d3.select(this)           
                     .style("stroke", "black")
@@ -265,13 +262,12 @@ function updateChart() {
     var localeVal = [];
     var controls = [];
 
-    var filteredStats = stats.filter(function(d) {
-        return true;
-      });
+    var filteredStats = stats.filter(function(d) {return true;});
 
+    console.log(xHistScale.ticks());
     bins = d3.histogram()
         .domain(xHistScale.domain())
-        .thresholds(xHistScale.ticks(50))
+        .thresholds(xHistScale.ticks(100)) //50 or 100?
         .value(function(d) { return d.cost; })
         (filteredStats);
 
@@ -281,11 +277,11 @@ function updateChart() {
         
     dotBinsEnter = dotBins.enter()
         .append("g")
-        .merge(dotBins).attr("class", "gBin");
-
-
-    dotBinsEnter.attr("class", "gBin")
+        .merge(dotBins)
+        .attr("class", "gBin")
         .attr("transform", function(d){ return 'translate(' + [xHistScale(d.x0), padding.b] + ')'; });
+    // dotBinsEnter.attr("class", "gBin")
+    //     .attr("transform", function(d){ return 'translate(' + [xHistScale(d.x0), padding.b] + ')'; });
 
     //what is this doing tbh 
     dots = dotBinsEnter.selectAll(".dot")
