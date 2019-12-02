@@ -30,6 +30,7 @@ var chartWidth = svgWidth - padding.l - padding.r;
 var chartHeight = svgHeight - padding.t - padding.b;
 
 var xHistScale;
+var hist;
 
 //why is this reversing here
 //also these colors really ugly lol i just chose a random palette 
@@ -39,33 +40,6 @@ var reversedColors = valueColors.slice().reverse();
 var colorScale = d3.scaleQuantize()
       .domain([5000, 65000])
       .range(valueColors);
-
-var hist = svg.append('g')
-            .attr('class', 'histogram')
-            .attr("transform", function(d){ return 'translate(' + [padding.t, padding.l] + ')'; });
-
-//TODO: probably change fonts too
-hist.append('text')
-    .attr('class', 'hist_y_axis_label')
-    .attr('transform', function(d) {return "translate("+[-30,450]+") " + "rotate(270)"})
-    .text('Number of Colleges')
-    .style('font-size', '15px')
-    .attr("font-family", "Trebuchet MS");
-
-//TODO: need to reformat this 
-hist.append('text')
-    .attr('class', 'hist_title')
-    .attr('transform', function(d) {return "translate("+[25,50]+") "})
-    .text('Distribution of Admission Rates')
-    .style('font-size', '15pt')
-    .attr("font-family", "Trebuchet MS");
-
-hist.append('text')
-    .attr('class', 'legend_title')
-    .attr('transform', function(d) {return "translate("+[250,130]+") "})
-    .text('Median Earnings (USD)')
-    .style('font-size', '15px')
-    .attr("font-family", "Trebuchet MS");
 
 // var plot = svg.append('g')
 //     .attr('class', 'plot')
@@ -77,28 +51,7 @@ var yHistScale = d3.scaleLinear()
 
 //TODO: need to rethink stuff with leged 
 var legendHist = ['50k+', '35k-50k', '$20k-35k', '$20k+'];
-// var legendTitle = ['Median Earnings 8 years After Entry'];
-
-hist.selectAll(".legend")
-    .data(reversedColors).enter()
-    .append("rect")
-    .attr("fill", function (color){ return color; })
-    .attr("x", 650)
-    .attr("y", function(c, i) {return (i * 20) ; })
-    .attr("width", 17)
-    .attr("height", 17)
-    .attr("transform", 'translate(' +[-400, 150]+')');
-
-hist.selectAll(".legend_label")
-    .data(legendHist).enter()
-    .append("text")
-    .attr('class', 'legend_label')
-    .attr('transform', 'translate('+[-200,163]+')')
-    .text(function(d) {return d})
-    .attr('x', 475)
-    .attr('y', function(c, i) {return i * 20})
-    .style('font-size', '12px')
-    .attr("font-family", "Trebuchet MS");
+var legendTitle = ['Median Earnings 8 years After Entry'];
 
 svg.append('g') // Append a g element for the scale
     .attr('class', 'yHist_axis') // Use a class to css style the axes together
@@ -113,6 +66,11 @@ var tip = d3.tip()
     });
 
 svg.call(tip);
+
+var active_link = "0"; //to control legend selections and hover
+var legendClicked; //to control legend selections
+var legendClassArray = []; //store legend classes to select bars in plotSingle()
+var y_orig; //to store original y-posn
 
 d3.csv('./colleges.csv',
     function(d){
@@ -148,6 +106,33 @@ d3.csv('./colleges.csv',
             .attr('transform', 'translate(50, 660)') // Position the axis
             .call(d3.axisBottom(xHistScale)); // Call the axis function
 
+        hist = svg.append('g')
+            .attr('class', 'histogram')
+            .attr("transform", function(d){ return 'translate(' + [padding.t, padding.l] + ')'; });
+
+        ``//TODO: probably change fonts too
+        hist.append('text')
+            .attr('class', 'hist_y_axis_label')
+            .attr('transform', function(d) {return "translate("+[-30,450]+") " + "rotate(270)"})
+            .text('Number of Colleges')
+            .style('font-size', '15px')
+            .attr("font-family", "Trebuchet MS");
+
+        //TODO: need to reformat this 
+        hist.append('text')
+            .attr('class', 'hist_title')
+            .attr('transform', function(d) {return "translate("+[25,50]+") "})
+            .text('Distribution of Admission Rates')
+            .style('font-size', '15pt')
+            .attr("font-family", "Trebuchet MS");
+
+        hist.append('text')
+            .attr('class', 'legend_title')
+            .attr('transform', function(d) {return "translate("+[250,130]+") "})
+            .text('Median Earnings (USD)')
+            .style('font-size', '15px')
+            .attr("font-family", "Trebuchet MS");
+``
         hist.append('text')
             .attr('class', 'hist_x_axis_label')
             .attr('transform', function(d) {return "translate("+[200,650]+") " })
@@ -185,6 +170,77 @@ d3.csv('./colleges.csv',
           regionsArr.push(tempObj);
         });
 
+        var legend = hist.selectAll(".legend")
+            .data(reversedColors).enter()
+            .append("rect")
+            .attr("fill", function (color){ return color; })
+            .attr("x", 650)
+            .attr("y", function(c, i) {return (i * 20) ; })
+            .attr("width", 17)
+            .attr("height", 17)
+            .attr("class", function(d) {
+                legendClassArray.push(d.replace(/\s/g, ''));
+                return "legend";
+            })
+            .attr("transform", 'translate(' +[-400, 150]+')')
+            .on("mouseover", function() {
+                console.log("testing");
+                if (active_link === "0") d3.select(this).style("cursor", "pointer");
+                else {
+                    if (active_link.split("class").pop() === this.id.split("id").pop()) {
+                    d3.select(this).style("cursor", "pointer");
+                    } else d3.select(this).style("cursor", "auto");
+                }
+            })
+            .on("click",function(d){        
+
+                if (active_link === "0") { //nothing selected, turn on this selection
+                  d3.select(this)           
+                    .style("stroke", "black")
+                    .style("stroke-width", 2);
+        
+                    active_link = this.id.split("id").pop();
+                    plotSingle(this);
+        
+                    //gray out the others
+                    for (i = 0; i < legendClassArray.length; i++) {
+                      if (legendClassArray[i] != active_link) {
+                        d3.select("#id" + legendClassArray[i])
+                          .style("opacity", 0.5);
+                      }
+                    }
+                   
+                } else { //deactivate
+                  if (active_link === this.id.split("id").pop()) {//active square selected; turn it OFF
+                    d3.select(this)           
+                      .style("stroke", "none");
+        
+                    active_link = "0"; //reset
+        
+                    //restore remaining boxes to normal opacity
+                    for (i = 0; i < legendClassArray.length; i++) {              
+                        d3.select("#id" + legendClassArray[i])
+                          .style("opacity", 1);
+                    }
+        
+                    //restore plot to original
+                    restorePlot(d);
+        
+                  }
+        
+                } //end active_link check
+            });
+
+        hist.selectAll(".legend_label")
+            .data(legendHist).enter()
+            .append("text")
+            .attr('class', 'legend_label')
+            .attr('transform', 'translate('+[-200,163]+')')
+            .text(function(d) {return d})
+            .attr('x', 475)
+            .attr('y', function(c, i) {return i * 20})
+            .style('font-size', '12px')
+            .attr("font-family", "Trebuchet MS");
         //console.log("regionsArr: ", regionsArr)
         updateChart();
 
@@ -192,8 +248,10 @@ d3.csv('./colleges.csv',
 
 
 //function updateChart(SATRange, ACTRange, regions, sizeRange, costRange) {
+var bins;
 var dotsEnter;
 var dotBins;
+var dotBinsEnter;
 var arrayofrects = [];
 var counting = 0; 
 var dots; 
@@ -211,7 +269,7 @@ function updateChart() {
         return true;
       });
 
-    var bins = d3.histogram()
+    bins = d3.histogram()
         .domain(xHistScale.domain())
         .thresholds(xHistScale.ticks(50))
         .value(function(d) { return d.cost; })
@@ -221,7 +279,7 @@ function updateChart() {
         .data( function() {
             return bins; });
         
-    var dotBinsEnter = dotBins.enter()
+    dotBinsEnter = dotBins.enter()
         .append("g")
         .merge(dotBins).attr("class", "gBin");
 
@@ -248,10 +306,7 @@ function updateChart() {
     dotsEnter = dots.enter()
         .append("rect");
     
-    dotsEnter.attr("x", function(d, i) {
-            console.log(this);
-            return xHistScale(i) + 80//console.log(d);
-        })
+    dotsEnter.attr("x", 0)
         .attr("y", function(d, i) {
                 //console.log(d.name);
                 arrayofrects[counting] = d.name;
@@ -270,22 +325,77 @@ function updateChart() {
         .on("mouseover", function(d) {
             color(this);
             tip.show(d);
-            //console.log(d3.select(this).attr("x"));
-            // var delta = d.y1 - d.y0;
-            // var xPos = parseFloat(d3.select(this).attr("x"));
-            // var yPos = parseFloat(d3.select(this).attr("y"));
-            // var height = parseFloat(d3.select(this).attr("height"))
-            // svg.append("text")
-            //     .attr("x",xPos)
-            //     .attr("y",yPos +height/2)
-            //     .attr("class","tooltip")
-            //     .text("testing"); 
         })					
         .on("mouseout", function(d) {
             tip.hide(d);
             uncolor(this);	
         });
 }
+
+function restorePlot(d) {
+
+    var shift = hist.selectAll('.gBin').forEach(function (d, i) {      
+      //restore shifted bars to original posn
+      d3.select(d[idx])
+        .transition()
+        .duration(1000)        
+        .attr("y", y_orig[i]);
+    })
+
+    //restore opacity of erased bars
+    for (i = 0; i < legendClassArray.length; i++) {
+      if (legendClassArray[i] != class_keep) {
+        d3.selectAll(".class" + legendClassArray[i])
+          .transition()
+          .duration(1000)
+          .delay(750)
+          .style("opacity", 1);
+      }
+    }
+
+  }
+
+  function plotSingle(d) {
+    class_keep = d.id.split("id").pop();
+    idx = legendClassArray.indexOf(class_keep);    
+   
+    //erase all but selected bars by setting opacity to 0
+    for (i = 0; i < legendClassArray.length; i++) {
+      if (legendClassArray[i] != class_keep) {
+        d3.selectAll(".class" + legendClassArray[i])
+          .transition()
+          .duration(1000)          
+          .style("opacity", 0);
+      }
+    }
+
+    //lower the bars to start on x-axis
+    y_orig = [];
+    var lower = bins.selectAll(".gBin").forEach(function (d, i) {        
+    
+      //get height and y posn of base bar and selected bar
+      h_keep = d3.select(d[idx]).attr("height");
+      y_keep = d3.select(d[idx]).attr("y");
+      //store y_base in array to restore plot
+      y_orig.push(y_keep);
+
+      h_base = d3.select(d[0]).attr("height");
+      y_base = d3.select(d[0]).attr("y");    
+
+      h_shift = h_keep - h_base;
+      y_new = y_base - h_shift;
+
+      //reposition selected bars
+      d3.select(d[idx])
+        .transition()
+        .ease("bounce")
+        .duration(1000)
+        .delay(750)
+        .attr("y", y_new);
+   
+    })    
+   
+  } 
 
 //idk what these color functions are doing 
 function color(d) {
