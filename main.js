@@ -28,6 +28,7 @@ var chartHeight = svgHeight - padding.t - padding.b;
 var xHistScale;
 var yHistScale;
 var hist;
+var graphPlace; 
 
 //why is this reversing here
 //also these colors really ugly lol i just chose a random palette 
@@ -108,6 +109,10 @@ d3.csv('./colleges.csv',
             .attr('class', 'yHist_axis') // Use a class to css style the axes together
             .attr('transform', 'translate(50, 180)') // Position the axis
             .call(d3.axisLeft(yHistScale)); // Call the axis function
+
+        graphPlace = hist.append('g')
+            .attr('class', 'graphPlace')
+            .attr("transform", function(d) { return "translate(" + "0" + ",0)"; });
 
         hist.append('text')
             .attr('class', 'hist_y_axis_label')
@@ -271,9 +276,12 @@ function updateChart() {
         .value(function(d) { return d.cost; })
         (filteredStats);
 
-    dotBins = hist.selectAll('.gBin')
+    dotBins = graphPlace.selectAll('.gBin')
         .data( function() {
-            return bins; });
+            return bins; })
+        // .append("g")
+        // .attr("class", "g")
+        // .attr("transform", function(d) { return "translate(" + "0" + ",0)"; });
         
     dotBinsEnter = dotBins.enter()
         .append("g")
@@ -300,9 +308,8 @@ function updateChart() {
         }))
 
     dotsEnter = dots.enter()
-        .append("rect");
-    
-    dotsEnter.attr("x", 0)
+        .append("rect")
+        .attr("x", 0)
         .attr("y", function(d, i) {
                 //console.log(d.name);
                 arrayofrects[counting] = d.name;
@@ -334,6 +341,56 @@ function updateChart() {
         });
 }
 
+function plotSingle(d) {
+    class_keep = d.id.split("id").pop();
+    idx = legendClassArray.indexOf(class_keep);    
+   
+    //erase all but selected bars by setting opacity to 0
+    for (i = 0; i < legendClassArray.length; i++) {
+      if (legendClassArray[i] != class_keep) {
+        d3.selectAll(".class" + legendClassArray[i])
+          .transition()
+          .duration(1000)          
+          .style("opacity", 0);
+      }
+    }
+
+    //lower the bars to start on x-axis
+    y_orig = [];
+    //console.log(hist.selectAll(".gBin"));
+    var squares = hist.selectAll(".gBin");
+
+    squares.each( function(d, i) {
+        console.log("why dun this work"); 
+        console.log(d); 
+    });
+
+    squares.nodes().forEach(function(d, i) {
+        var nodes = d.childNodes;
+        console.log(nodes);
+        //get height and y posn of base bar and selected bar
+        h_keep = d3.select(nodes[idx]).attr("height");
+        y_keep = d3.select(nodes[idx]).attr("y");
+
+        h_base = d3.select(nodes[0]).attr("height");
+        y_base = d3.select(nodes[0]).attr("y");
+
+        h_shift = h_keep - h_base;
+        y_new = y_base - h_shift;
+
+
+      //reposition selected bars
+      d3.select(d[idx])
+        .transition()
+        .ease("bounce")
+        .duration(1000)
+        .delay(750)
+        .attr("y", y_new);
+   
+    })    
+   
+} 
+
 function restorePlot(d) {
 
     var shift = hist.selectAll('.gBin').forEach(function (d, i) {      
@@ -356,48 +413,6 @@ function restorePlot(d) {
     }
 
   }
-
-  function plotSingle(d) {
-    class_keep = d.id.split("id").pop();
-    idx = legendClassArray.indexOf(class_keep);    
-   
-    //erase all but selected bars by setting opacity to 0
-    for (i = 0; i < legendClassArray.length; i++) {
-      if (legendClassArray[i] != class_keep) {
-        d3.selectAll(".class" + legendClassArray[i])
-          .transition()
-          .duration(1000)          
-          .style("opacity", 0);
-      }
-    }
-
-    //lower the bars to start on x-axis
-    y_orig = [];
-    var lower = bins.selectAll(".gBin").forEach(function (d, i) {        
-    
-      //get height and y posn of base bar and selected bar
-      h_keep = d3.select(d[idx]).attr("height");
-      y_keep = d3.select(d[idx]).attr("y");
-      //store y_base in array to restore plot
-      y_orig.push(y_keep);
-
-      h_base = d3.select(d[0]).attr("height");
-      y_base = d3.select(d[0]).attr("y");    
-
-      h_shift = h_keep - h_base;
-      y_new = y_base - h_shift;
-
-      //reposition selected bars
-      d3.select(d[idx])
-        .transition()
-        .ease("bounce")
-        .duration(1000)
-        .delay(750)
-        .attr("y", y_new);
-   
-    })    
-   
-  } 
 
 //idk what these color functions are doing 
 function color(d) {
