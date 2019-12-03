@@ -15,6 +15,8 @@ var debt = [];
 var pop = [];
 var colors = ["gray", '#996600', '#660066', "#003300", '#003366', '#C8C8C8', '#000000', '#680000']
 
+var binContainer = []; 
+
 var svg = d3.select('#svg1');
 
 var svgWidth = 3000;
@@ -87,7 +89,7 @@ d3.csv('./colleges.csv',
             control: d.Control,
             cost: +d['Average Cost'],
             salary: +d['Median Earnings 8 years After Entry'],
-            debt: +d['Median Debt on Graduation']
+            debt: +d['Median Debt on Graduation'],
         }
     },
 
@@ -197,7 +199,6 @@ d3.csv('./colleges.csv',
             .attr("transform", 'translate(' +[-400, 150]+')')
             .on("mouseover", function() {
                 //makes cursor change
-                console.log("testing");
                 if (active_link === "0") d3.select(this).style("cursor", "pointer");
                 else {
                     if (active_link.split("class").pop() === this.id.split("id").pop()) {
@@ -294,13 +295,19 @@ function updateChart() {
         .append("g")
         .merge(dotBins)
         .attr("class", "gBin")
-        .attr("transform", function(d){ return 'translate(' + [xHistScale(d.x0), padding.b] + ')'; });
+        .attr("transform", function(d){ 
+            binContainer.push(d);
+            return 'translate(' + [xHistScale(d.x0), padding.b] + ')'; })
+        .attr("bin", function(d, i) {
+            return i;
+        });
+
     // dotBinsEnter.attr("class", "gBin")
     //     .attr("transform", function(d){ return 'translate(' + [xHistScale(d.x0), padding.b] + ')'; });
 
     //what is this doing tbh 
     dots = dotBinsEnter.selectAll(".dot")
-        .data(d => d.map((p, i) => {
+        .data((d, a) => d.map((p, i) => {
             return {idx: i,
                     cost: p['cost'],
                     admission: p['admission'],
@@ -311,13 +318,19 @@ function updateChart() {
                     locale: p['locale'],
                     control: p['control'],
                     salary: p['salary'],
-                    debt: p['debt']};
+                    debt: p['debt'],
+                    color: colorScale(p['salary']),
+                    bin: a
+                };
         }))
 
     dotsEnter = dots.enter()
         .append("rect")
         .attr("class", "rect")
-        .attr("x", 0)
+        .attr("x", function(d, i) {
+            //console.log("indotsenter");
+            //console.log(i, d);
+        })
         .attr("y", function(d, i) {
                 arrayofrects[counting] = d.name;
                 counting++;
@@ -327,15 +340,21 @@ function updateChart() {
                 //but then it extends past the y axis
                 return yHistScale(i) + 70
         })
+        .attr("ogY", function(d, i) {
+            return yHistScale(i) + 70
+        })
         .attr("width", 10)
         .attr("height", 10)
+        .attr("opacity", 1)
         .attr("color", function(d) {return colorScale(d['salary']); })
         .style("stroke", "white")
         .style("fill", function(d) {return colorScale(d['salary']); })
         .attr("name", function(d) { return d['name']})
         .on("mouseover", function(d) {
             //color(this);
-            tip.show(d);
+            if(d3.select(this).attr("opacity") == 1) {
+                tip.show(d);
+            }
             d3.select("#sName").text(d['name']);
             d3.select("#sRegion").text(d['region']);
             d3.select("#sAdmiss").text(d['admission']);
@@ -349,121 +368,68 @@ function updateChart() {
         });
 }
 
-colorRects = []
+colorRects = [];
+var squares; 
+var color_keep;
 
 function plotSingle(d) {
-    var color_keep = d3.select(d).attr("fill");
+    color_keep = d3.select(d).attr("fill");
    
-    console.log(legendClassArray);
     //erase all but selected bars by setting opacity to 0
     for (i = 0; i < legendClassArray.length; i++) {
       if (legendClassArray[i] != color_keep) {
-          console.log(legendClassArray[i]);
           //d3.select("[id='" + i + "']")
           //hist.selectAll(".rect" + legendClassArray[i])
           hist.selectAll("[color= '" + legendClassArray[i] + "']")
           .transition()
-          .duration(1000)          
+          .duration(1000)
+          .attr("opacity", 0)        
           .style("opacity", 0);
       }
     }
-    var b = hist.selectAll(".rect").each(function(d, i) {
-        console.log(i, d);
-        console.log(d[0]);
-        console.log(d3.select(this));
-    });
+    var currBin = -1;
+    var currMinHeight = 0;
     
-    // var b = hist.selectAll(".gBin").each(function(d, i) {
-    //     console.log(i, d);
-    //     console.log(d[0]);
-    //     console.log(d3.select(d));
-    // });
-    var recs = b.selectAll(".rect");
-    var binCount = 0;
-    
-    var squares = hist.selectAll("[color= '" + color_keep + "']")
+    squares = hist.selectAll("[color= '" + color_keep + "']")
         .each(function(d) {
             orig_y = parseInt(d3.select(this).attr("y"));
-            height = parseInt(d3.select(this).attr("height"));
-            idx = parseInt(d["idx"]);
+            if(d["bin"] > currBin) {
+                currBin = d["bin"];
+                currMinHeight = 550 - orig_y;
+            } 
 
-            //then this line becomes wonky
-            //d3.select(this).attr("y", (orig_y + height * idx).toString());
+            d3.select(this)
+            .transition()
+            .duration(1000)
+            .delay(750)
+            .attr("y", (currMinHeight + orig_y).toString());
         })
-
-    //lower the bars to start on x-axis
-    y_orig = [];
-    // squares.nodes().forEach( function(d, i) {
-    //     console.log(d3.select(d).attr("y"));
-    //     console.log(i);
-    //     //console.log(d3.select(this).attr("y"));
-    //     // col = d3.select(this).attr("color");
-    //     // if(col !== color_keep) {
-    //     //     console.log("disappear!");
-    //     //     d3.select(this).style("opacity", 0);
-    //     // }
-    //     //console.log(d3.select(this).attr("y"));
-    //     //console.log(this);
-    //     y_orig = d3.select(d).attr("y");
-    //     // console.log(y_orig);
-    //     //y_new = y_orig - d3.select(this).attr("height");
-    //     //console.log("y_orig", y_orig, "y_new", y_new);
-
-    //     d3.select(d)
-    //     .transition()
-    //     .duration(1000)
-    //     .delay(750)
-    //     .style("opacity", 1)
-    //     .attr("y", (y_orig + (chartHeight - y_orig)));
-
-    //     // console.log(y_orig, d3.select(this).attr("y"));
-    // });
-
-    // squares.nodes().forEach(function(d, i) {
-    //     var nodes = d.childNodes;
-    //     console.log(nodes);
-    //     //get height and y posn of base bar and selected bar
-    //     h_keep = d3.select(nodes[idx]).attr("height");
-    //     y_keep = d3.select(nodes[idx]).attr("y");
-
-    //     h_base = d3.select(nodes[0]).attr("height");
-    //     y_base = d3.select(nodes[0]).attr("y");
-
-    //     h_shift = h_keep - h_base;
-    //     y_new = y_base - h_shift;
-
-
-    //   //reposition selected bars
-    //   d3.select(d[idx])
-    //     .transition()
-    //     .ease("bounce")
-    //     .duration(1000)
-    //     .delay(750)
-    //     .attr("y", y_new);
-   
-    // })    
 } 
 
 function restorePlot(d) {
 
-    var shift = hist.selectAll('.gBin').forEach(function (d, i) {      
-      //restore shifted bars to original posn
-      d3.select(d[idx])
-        .transition()
-        .duration(1000)        
-        .attr("y", y_orig[i]);
+    hist.selectAll("[color= '" + color_keep + "']")
+        .each(function(d) {
+            var ogY = d3.select(this).attr("ogY");
+            d3.select(this)
+            .transition()
+            .duration(1000)
+            .delay(750)
+            .attr("y", ogY);
     })
     //restore opacity of erased bars
     for (i = 0; i < legendClassArray.length; i++) {
-      if (legendClassArray[i] != class_keep) {
-        d3.selectAll(".class" + legendClassArray[i])
-          .transition()
-          .duration(1000)
-          .delay(750)
-          .style("opacity", 1);
-      }
+        if (legendClassArray[i] != color_keep) {
+            //d3.select("[id='" + i + "']")
+            //hist.selectAll(".rect" + legendClassArray[i])
+            hist.selectAll("[color= '" + legendClassArray[i] + "']")
+            .transition()
+            .duration(1000)
+            .delay(750)
+            .attr("opacity", 1)        
+            .style("opacity", 1);
+        }
     }
-
   }
 
 //idk what these color functions are doing 
