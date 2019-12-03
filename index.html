@@ -3,10 +3,12 @@
 
 <head>
     <meta charset="UTF-8" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link href="style.css" type="text/css" rel="stylesheet" />
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script type="text/javascript" src="main.js"></script>
     <script src="d3-tip.js"></script>
+
 
     <body>
         <div id="main">
@@ -16,27 +18,64 @@
             </div>
         </div>
         <!-- gotta move this eventually-->
-        <div class="infobox" style="visibility: hidden;">
-            <strong>Name:</strong> <span id="sName"></span><br/>
-            <strong>Region:</strong> <span id="sRegion"></span><br/>
-            <strong>Admission Rate:</strong> <span id="sAdmiss"></span><br/>
-            <strong>ACT:</strong> <span id="sACT"></span><br/>
-            <strong>SAT:</strong> <span id="sSAT"></span><br/>
-            <strong>Average Cost:</strong> <span id="sCost"></span><br/>
-        </div>
-        <div id="main2">
-            <svg width="1400" height="700" id="svg1">
+        <!-- <div class="card">
+            <div class="infobox" style="visibility: hidden;">
+
+                <h2 id="sName"></h2>
+                <hr/>
+                <strong>Region: </strong> <span id="sRegion"></span><br/>
+                <strong>Relative Size: </strong> <span id="sLocale"></span><br/>
+                <strong>Type: </strong> <span id="sControl"></span><br/>
+                <br/>
+
+                <strong>Median Debt on Graduation:</strong> <span id="sDebt"></span><br/>
+                <strong>Cost of Attendance:</strong> <span id="sCost"></span><br/>
+                <br/>
+
+                <strong>Admission Rate:</strong> <span id="sAdmission"></span><br/>
+                <strong>Median ACT:</strong> <span id="sACT"></span><br/>
+                <strong>Average SAT:</strong> <span id="sSAT"></span><br/>
+                <br/>
+            </div>
+        </div> -->
+
+        <!-- <div id="main2">
+            <svg width="2100" height="700" id="svg1" class="svg1" overflow="scroll">
             </svg>
-            <!-- <div class="container">
-                <div class="row">
-                    <div class="col">
+        </div> -->
 
-                    </div>
-                    <div class="col">
 
+
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col left col-sm-8" id="svg-col">
+                    <svg width="1400" height="700" id="svg1" class="svg1">
+                    </svg>
+                </div>
+                <div class="col right col-sm-4" id="card-col">
+                    <div class="card">
+                        <div class="infobox" width="100vw">
+
+                            <h2 id="sName">&nbsp;</h2>
+                            <hr/>
+                            <strong>Region: </strong> <span id="sRegion"></span><br/>
+                            <strong>Relative Size: </strong> <span id="sLocale"></span><br/>
+                            <strong>Type: </strong> <span id="sControl"></span><br/>
+                            <br/>
+
+                            <strong>Median Debt on Graduation:</strong> <span id="sDebt"></span><br/>
+                            <strong>Cost of Attendance:</strong> <span id="sCost"></span><br/>
+                            <br/>
+
+                            <strong>Admission Rate:</strong> <span id="sAdmission"></span><br/>
+                            <strong>Median ACT:</strong> <span id="sACT"></span><br/>
+                            <strong>Average SAT:</strong> <span id="sSAT"></span><br/>
+                            <br/>
+                        </div>
                     </div>
                 </div>
-            </div> -->
+            </div>
         </div>
 
     </body>
