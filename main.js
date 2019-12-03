@@ -369,13 +369,18 @@ function updateChart() {
             tip.hide(d);
             //uncolor(this);
             d3.select(this).style("fill", function (d) { return colorScale(d['salary']); }); 
-
-            d3.select("#sName").text("").append("tspan");
-            d3.select("#sRegion").text("").append("tspan");
-            d3.select("#sAdmiss").text("").append("tspan");
-            d3.select("#sACT").text("").append("tspan");
-            d3.select("#sSAT").text("").append("tspan");
-            d3.select("#sCost").text("").append("tspan");
+            
+            //probably bad practice here?
+            // d3.select("#sName").text("").append("tspan");
+            // d3.select("#sRegion").text("").append("tspan");
+            // d3.select("#sAdmiss").text("").append("tspan");
+            // d3.select("#sACT").text("").append("tspan");
+            // d3.select("#sSAT").text("").append("tspan");
+            // d3.select("#sCost").text("").append("tspan");
+        })
+        .on("click", function(d) {
+            console.log(d['name']); 
+            d3.select(".infobox").style('visibility', 'visible');
         });
 }
 
