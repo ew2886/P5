@@ -112,12 +112,10 @@ path.domain {
     flex-direction: column;
     display: flex;
     justify-content: center;
-    margin: 5px;
 }
 
 .row .col svg {
     flex: 1;
-    margin: 5px;
 }
 
 @media all and (max-width:400px) {
@@ -125,4 +123,8 @@ path.domain {
     .row {
         flex-direction: column
     }
+}
+
+.hist_x_axis_label {
+    margin-bottom: 10px;
 }

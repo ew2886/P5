@@ -58,6 +58,7 @@ var colorScale = d3.scaleQuantize()
 //     .attr('class', 'plot')
 //     .attr("transform", function(d) {return 'translate(' + [100, 100]+')'; });
 
+
 //TODO: need to rethink stuff with leged 
 var legendHist = ['$52k+', '$44k-$52k', '$36k-$44k', '$28k-$36k', '< $28k'];
 var legendTitle = ['Median Earnings 8 years After Entry'];
@@ -369,12 +370,12 @@ function updateChart() {
         .on("mouseout", function(d) {
             tip.hide(d);
             //uncolor(this);
-            d3.select("#sName").text("");
-            d3.select("#sRegion").text("");
-            d3.select("#sAdmiss").text("");
-            d3.select("#sACT").text("");
-            d3.select("#sSAT").text("");
-            d3.select("#sCost").text("");
+            d3.select("#sName").text("").append("tspan");
+            d3.select("#sRegion").text("").append("tspan");
+            d3.select("#sAdmiss").text("").append("tspan");
+            d3.select("#sACT").text("").append("tspan");
+            d3.select("#sSAT").text("").append("tspan");
+            d3.select("#sCost").text("").append("tspan");
         });
 }
 
