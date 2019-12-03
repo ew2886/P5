@@ -31,6 +31,9 @@ var xHistScale;
 var yHistScale;
 var hist;
 var graphPlace; 
+var regionDropdown; 
+var actDropdown;
+var satDropdown;
 
 //why is this reversing here
 //also these colors really ugly lol i just chose a random palette 
@@ -171,19 +174,6 @@ d3.csv('./colleges.csv',
         //     return d.salary;
         // });
 
-        //TODO: 
-        //this isn't being used rn maybe we can use for some filtering
-        var regions = d3.nest()
-            .key(function(d) { return d.region; })
-            .entries(dataset);
-        var regionsArr = [];
-        regions.forEach(function(e) {
-          var tempObj = {}
-          tempObj.label = e.key;
-          tempObj.selected = true;
-          regionsArr.push(tempObj);
-        });
-
         var legend = hist.selectAll(".legend")
             .data(valueColors.slice().reverse()).enter()
             .append("rect")
@@ -258,8 +248,89 @@ d3.csv('./colleges.csv',
         //console.log("regionsArr: ", regionsArr)
         updateChart();
 
+        //TODO: 
+        //this isn't being used rn maybe we can use for some filtering
+        // var regions = d3.nest()
+        //     .key(function(d) { return d.region; });
+        // var regionsArr = [];
+        // regions.forEach(function(e) {
+        //   var tempObj = {}
+        //   tempObj.label = e.key;
+        //   tempObj.selected = true;
+        //   regionsArr.push(tempObj);
+        // });
+        var regions = d3.map(stats, function(d) {
+            return d.region;
+        }).keys();
+        
+
+        var ACTscores = [[15, 17], [18, 20], [21, 23], [24, 26], [26, 28], [28, 29],[30, 31], [32, 34]]
+        var SATscores = [[700, 800], [801, 900], [901, 1000], [1001, 1100], [1101, 1200], [1201, 130], [1301, 1400], [1401, 1500], [1501, 1600]]
+
+        regionDropdown = d3.select("#regionSelect")
+                    .on("change", function(d) {
+                        var reg = d3.select(this).property("value");
+                        var test = hist.selectAll("[region= '" + reg + "']");
+                        console.log(test);
+                        hist.selectAll('.rect')
+                            .filter(function(d) {
+                                return d.region !== reg;
+                        })
+                        .style("fill", "gray");
+                    });
+
+        regionDropdown.selectAll("option")
+                    .data(regions)
+                    .enter().append("option")
+                    .attr("value", function (d) {return d;})
+                    .text(function (d) {
+                        return d;
+                    });
+
+        actDropdown = d3.select("#actSelect")
+            .on("change", function() {
+                console.log(d3.select(this));
+                console.log(d3.select(this).property("option"));
+            });
+        actDropdown.selectAll("option")
+                    .data(ACTscores)
+                    .enter().append("option")
+                    .attr("minValue", function(d) {return d[0];})
+                    .attr("maxValue", function(d) {return d[1]})
+                    .text(function (d) {
+                        return d[0] + " - " + d[1];
+                    });
+
+        satDropdown = d3.select("#satSelect").on("change", dropdownChange());
+        satDropdown.selectAll("option")
+                    .data(SATscores)
+                  .enter().append("option")
+                    .attr("minValue", function(d) {
+                        return d[0];
+                    })
+                    .attr("maxValue", function(d) {return d[1];})
+                    .text(function (d) {
+                        return d[0] + " - " + d[1];
+                    });
+
+        d3.select("#reset")
+            .on("click", function() {
+                hist.selectAll(".rect")
+                    .transition()
+                    .duration(500)
+                    .style('fill', function(d) {
+                        console.log(d);
+                        return colorScale(d.salary);
+                    })
+            })
+
     });
 
+
+function dropdownChange() {
+    console.log("dropdown");
+    console.log(d3.select(this).attr("minValue"));
+}
 
 //function updateChart(SATRange, ACTRange, regions, sizeRange, costRange) {
 var bins;
@@ -430,7 +501,6 @@ function restorePlot(d) {
             d3.select(this)
             .transition()
             .duration(1000)
-            .delay(750)
             .attr("y", ogY);
     })
     //restore opacity of erased bars
