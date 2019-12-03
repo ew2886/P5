@@ -128,3 +128,16 @@ path.domain {
 .hist_x_axis_label {
     margin-bottom: 10px;
 }
+
+fill: none;
+stroke-width: 2px;
+stroke: black;
+
+}
+.tooltip {
+    text-anchor: middle;
+    font-family: sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+    fill: black;
+}

@@ -1,4 +1,4 @@
-var data_set = [];
+var data_set =[];
 var hello = [];
 var control = [];
 var locale = [];
@@ -15,14 +15,14 @@ var debt = [];
 var pop = [];
 var colors = ["gray", '#996600', '#660066', "#003300", '#003366', '#C8C8C8', '#000000', '#680000']
 
-var binContainer = [];
+var binContainer = []; 
 
 var svg = d3.select('#svg1');
 
 var svgWidth = 3000;
 var svgHeight = 700;
 
-var padding = { t: 50, r: 50, b: 50, l: 50 };
+var padding = {t: 50, r: 50, b: 50, l: 50};
 
 var chartWidth = svgWidth - padding.l - padding.r;
 var chartHeight = svgHeight - padding.t - padding.b;
@@ -30,24 +30,24 @@ var chartHeight = svgHeight - padding.t - padding.b;
 var xHistScale;
 var yHistScale;
 var hist;
-var graphPlace;
+var graphPlace; 
 
 //why is this reversing here
 //also these colors really ugly lol i just chose a random palette 
-var valueColors = ['#FFFF02', '#FED825', '#FFA15A', '#FF6496', '#EC02E2'];
+var valueColors = ['#FFFF02', '#FED825', '#FFA15A', '#FF6496',  '#EC02E2'];
 var reversedColors = valueColors.slice().reverse();
 
 //what's the domain here for?
 var colorScale = d3.scaleQuantize()
-    .domain([20000, 60000]) //15000, 65000
-    .range(valueColors);
+      .domain([20000, 60000]) //15000, 65000
+      .range(valueColors);
 
-// thresholds   
-// #FFFF02:  (2) [20000, 28000]
-// #FED825:  (2) [28000, 36000]
-// #FFA15A:  (2) [36000, 44000]
-// #FF6496:  (2) [44000, 52000]
-// #EC02E2:  (2) [52000, 60000]
+    // thresholds   
+    // #FFFF02:  (2) [20000, 28000]
+    // #FED825:  (2) [28000, 36000]
+    // #FFA15A:  (2) [36000, 44000]
+    // #FF6496:  (2) [44000, 52000]
+    // #EC02E2:  (2) [52000, 60000]
 // console.log("#FFFF02: ",colorScale.invertExtent("#FFFF02"));//returns [25, 37.5]
 // console.log("#FED825: ",colorScale.invertExtent("#FED825"));//returns [25, 37.5]
 // console.log("#FFA15A: ",colorScale.invertExtent("#FFA15A"));//returns [25, 37.5]
@@ -67,7 +67,7 @@ var tip = d3.tip()
     .attr('class', 'd3-tip')
     .offset([0, 0])
     .html(function(d) {
-        return d["name"];
+      return d["name"];
     });
 
 svg.call(tip);
@@ -78,7 +78,7 @@ var legendClassArray = []; //store legend classes to select bars in plotSingle()
 var y_orig; //to store original y-posn
 
 d3.csv('./colleges.csv',
-    function(d) {
+    function(d){
         // This callback formats each row of the data
         return {
             name: d.Name,
@@ -94,8 +94,8 @@ d3.csv('./colleges.csv',
         }
     },
 
-    function(error, dataset) {
-        if (error) {
+    function(error, dataset){
+        if(error) {
             return;
         }
 
@@ -111,9 +111,9 @@ d3.csv('./colleges.csv',
 
         hist = svg.append('g')
             .attr('class', 'histogram')
-            .attr("transform", function(d) { return 'translate(' + [padding.t, padding.l] + ')'; });
+            .attr("transform", function(d){ return 'translate(' + [padding.t, padding.l] + ')'; });
 
-        `` //TODO: probably change fonts too
+        ``//TODO: probably change fonts too
         yHistScale = d3.scaleLinear()
             .domain([0, 40])
             .range([chartHeight * .8, 0]);
@@ -129,7 +129,7 @@ d3.csv('./colleges.csv',
 
         hist.append('text')
             .attr('class', 'hist_y_axis_label')
-            .attr('transform', function(d) { return "translate(" + [-30, 450] + ") " + "rotate(270)" })
+            .attr('transform', function(d) {return "translate("+[-30,450]+") " + "rotate(270)"})
             .text('Number of Colleges')
             .style('font-size', '15px')
             .attr("font-family", "Trebuchet MS");
@@ -137,7 +137,7 @@ d3.csv('./colleges.csv',
         //TODO: need to reformat this 
         hist.append('text')
             .attr('class', 'hist_title')
-            .attr('transform', function(d) { return "translate(" + [25, 50] + ") " })
+            .attr('transform', function(d) {return "translate("+[25,50]+") "})
             .text('Distribution of Admission Rates')
             .style('font-size', '15pt')
             .attr("font-family", "Trebuchet MS");
@@ -148,15 +148,15 @@ d3.csv('./colleges.csv',
             .text('Median Earnings (USD)')
             .style('font-size', '15px')
             .attr("font-family", "Trebuchet MS");
-        ``
+``
         hist.append('text')
             .attr('class', 'hist_x_axis_label')
-            .attr('transform', function(d) { return "translate(" + [200, 650] + ") " })
+            .attr('transform', function(d) {return "translate("+[200,650]+") " })
             .text('Average Cost ($)')
             .style('font-size', '15px')
             .attr("font-family", "Trebuchet MS");
-
-
+        
+        
         var sortedData = dataset.sort(function(a, b) {
             return b.salary - a.salary;
         })
@@ -178,18 +178,18 @@ d3.csv('./colleges.csv',
             .entries(dataset);
         var regionsArr = [];
         regions.forEach(function(e) {
-            var tempObj = {}
-            tempObj.label = e.key;
-            tempObj.selected = true;
-            regionsArr.push(tempObj);
+          var tempObj = {}
+          tempObj.label = e.key;
+          tempObj.selected = true;
+          regionsArr.push(tempObj);
         });
 
         var legend = hist.selectAll(".legend")
             .data(valueColors.slice().reverse()).enter()
             .append("rect")
-            .attr("fill", function(color) { return color; })
+            .attr("fill", function (color){ return color; })
             .attr("x", 650)
-            .attr("y", function(c, i) { return (i * 20); })
+            .attr("y", function(c, i) {return (i * 20) ; })
             .attr("width", 17)
             .attr("height", 17)
             .attr("class", function(d) {
@@ -203,45 +203,45 @@ d3.csv('./colleges.csv',
                 if (active_link === "0") d3.select(this).style("cursor", "pointer");
                 else {
                     if (active_link.split("class").pop() === this.id.split("id").pop()) {
-                        d3.select(this).style("cursor", "pointer");
+                    d3.select(this).style("cursor", "pointer");
                     } else d3.select(this).style("cursor", "auto");
                 }
             })
-            .on("click", function(d) {
+            .on("click",function(d){        
                 if (active_link === "0") { //nothing selected, turn on this selection
-                    d3.select(this)
-                        .style("stroke", "black")
-                        .style("stroke-width", 2);
-
+                  d3.select(this)           
+                    .style("stroke", "black")
+                    .style("stroke-width", 2);
+        
                     active_link = this.id.split("id").pop();
                     plotSingle(this);
-
+        
                     //gray out the others
                     for (i = 0; i < legendClassArray.length; i++) {
-                        if (legendClassArray[i] != active_link) {
-                            d3.select("#id" + legendClassArray[i])
-                                .style("opacity", 0.5);
-                        }
+                      if (legendClassArray[i] != active_link) {
+                        d3.select("#id" + legendClassArray[i])
+                          .style("opacity", 0.5);
+                      }
                     }
-
+                   
                 } else { //deactivate
-                    if (active_link === this.id.split("id").pop()) { //active square selected; turn it OFF
-                        d3.select(this)
-                            .style("stroke", "none");
-
-                        active_link = "0"; //reset
-
-                        //restore remaining boxes to normal opacity
-                        for (i = 0; i < legendClassArray.length; i++) {
-                            d3.select("#id" + legendClassArray[i])
-                                .style("opacity", 1);
-                        }
-
-                        //restore plot to original
-                        restorePlot(d);
-
+                  if (active_link === this.id.split("id").pop()) {//active square selected; turn it OFF
+                    d3.select(this)           
+                      .style("stroke", "none");
+        
+                    active_link = "0"; //reset
+        
+                    //restore remaining boxes to normal opacity
+                    for (i = 0; i < legendClassArray.length; i++) {              
+                        d3.select("#id" + legendClassArray[i])
+                          .style("opacity", 1);
                     }
-
+        
+                    //restore plot to original
+                    restorePlot(d);
+        
+                  }
+        
                 } //end active_link check
             });
 
@@ -252,7 +252,7 @@ d3.csv('./colleges.csv',
             .attr('transform', 'translate(' + [-300, 163] + ')')
             .text(function(d) { return d })
             .attr('x', 475)
-            .attr('y', function(c, i) { return i * 20 })
+            .attr('y', function(c, i) {return i * 20})
             .style('font-size', '12px')
             .attr("font-family", "Trebuchet MS");
         //console.log("regionsArr: ", regionsArr)
@@ -267,9 +267,8 @@ var dotsEnter;
 var dotBins;
 var dotBinsEnter;
 var arrayofrects = [];
-var counting = 0;
-var dots;
-
+var counting = 0; 
+var dots; 
 function updateChart() {
     var costRange;
     var ACTRange;
@@ -278,7 +277,7 @@ function updateChart() {
     var localeVal = [];
     var controls = [];
 
-    var filteredStats = stats.filter(function(d) { return true; });
+    var filteredStats = stats.filter(function(d) {return true;});
 
     bins = d3.histogram()
         .domain(xHistScale.domain())
@@ -287,21 +286,19 @@ function updateChart() {
         (filteredStats);
 
     dotBins = graphPlace.selectAll('.gBin')
-        .data(function() {
-            return bins;
-        })
+        .data( function() {
+            return bins; })
         // .append("g")
         // .attr("class", "g")
         // .attr("transform", function(d) { return "translate(" + "0" + ",0)"; });
-
+        
     dotBinsEnter = dotBins.enter()
         .append("g")
         .merge(dotBins)
         .attr("class", "gBin")
-        .attr("transform", function(d) {
+        .attr("transform", function(d){ 
             binContainer.push(d);
-            return 'translate(' + [xHistScale(d.x0), padding.b] + ')';
-        })
+            return 'translate(' + [xHistScale(d.x0), padding.b] + ')'; })
         .attr("bin", function(d, i) {
             return i;
         });
@@ -312,21 +309,20 @@ function updateChart() {
     //what is this doing tbh 
     dots = dotBinsEnter.selectAll(".dot")
         .data((d, a) => d.map((p, i) => {
-            return {
-                idx: i,
-                cost: p['cost'],
-                admission: p['admission'],
-                name: p['name'],
-                SAT: p['SAT'],
-                ACT: p['ACT'],
-                region: p['region'],
-                locale: p['locale'],
-                control: p['control'],
-                salary: p['salary'],
-                debt: p['debt'],
-                color: colorScale(p['salary']),
-                bin: a
-            };
+            return {idx: i,
+                    cost: p['cost'],
+                    admission: p['admission'],
+                    name: p['name'],
+                    SAT: p['SAT'],
+                    ACT: p['ACT'],
+                    region: p['region'],
+                    locale: p['locale'],
+                    control: p['control'],
+                    salary: p['salary'],
+                    debt: p['debt'],
+                    color: colorScale(p['salary']),
+                    bin: a
+                };
         }))
 
     dotsEnter = dots.enter()
@@ -337,13 +333,13 @@ function updateChart() {
             //console.log(i, d);
         })
         .attr("y", function(d, i) {
-            arrayofrects[counting] = d.name;
-            counting++;
-            //so rn the top square is abnormally larger
-            //than the rest of the ones in the histogram? 
-            //it becomes the same size if you do i * 1.2
-            //but then it extends past the y axis
-            return yHistScale(i) + 70
+                arrayofrects[counting] = d.name;
+                counting++;
+                //so rn the top square is abnormally larger
+                //than the rest of the ones in the histogram? 
+                //it becomes the same size if you do i * 1.2
+                //but then it extends past the y axis
+                return yHistScale(i) + 70
         })
         .attr("ogY", function(d, i) {
             return yHistScale(i) + 70
@@ -351,13 +347,13 @@ function updateChart() {
         .attr("width", 10)
         .attr("height", 10)
         .attr("opacity", 1)
-        .attr("color", function(d) { return colorScale(d['salary']); })
+        .attr("color", function(d) {return colorScale(d['salary']); })
         .style("stroke", "white")
-        .style("fill", function(d) { return colorScale(d['salary']); })
-        .attr("name", function(d) { return d['name'] })
+        .style("fill", function(d) {return colorScale(d['salary']); })
+        .attr("name", function(d) { return d['name']})
         .on("mouseover", function(d) {
             //color(this);
-            if (d3.select(this).attr("opacity") == 1) {
+            if(d3.select(this).attr("opacity") == 1) {
                 tip.show(d);
             }
             d3.select("#sName").text(d['name']);
@@ -366,7 +362,7 @@ function updateChart() {
             d3.select("#sACT").text(d['ACT']);
             d3.select("#sSAT").text(d['SAT']);
             d3.select("#sCost").text(d['cost']);
-        })
+        })					
         .on("mouseout", function(d) {
             tip.hide(d);
             //uncolor(this);
@@ -380,42 +376,42 @@ function updateChart() {
 }
 
 colorRects = [];
-var squares;
+var squares; 
 var color_keep;
 
 function plotSingle(d) {
     color_keep = d3.select(d).attr("fill");
-
+   
     //erase all but selected bars by setting opacity to 0
     for (i = 0; i < legendClassArray.length; i++) {
-        if (legendClassArray[i] != color_keep) {
-            //d3.select("[id='" + i + "']")
-            //hist.selectAll(".rect" + legendClassArray[i])
-            hist.selectAll("[color= '" + legendClassArray[i] + "']")
-                .transition()
-                .duration(1000)
-                .attr("opacity", 0)
-                .style("opacity", 0);
-        }
+      if (legendClassArray[i] != color_keep) {
+          //d3.select("[id='" + i + "']")
+          //hist.selectAll(".rect" + legendClassArray[i])
+          hist.selectAll("[color= '" + legendClassArray[i] + "']")
+          .transition()
+          .duration(1000)
+          .attr("opacity", 0)        
+          .style("opacity", 0);
+      }
     }
     var currBin = -1;
     var currMinHeight = 0;
-
+    
     squares = hist.selectAll("[color= '" + color_keep + "']")
         .each(function(d) {
             orig_y = parseInt(d3.select(this).attr("y"));
-            if (d["bin"] > currBin) {
+            if(d["bin"] > currBin) {
                 currBin = d["bin"];
                 currMinHeight = 550 - orig_y;
-            }
+            } 
 
             d3.select(this)
-                .transition()
-                .duration(1000)
-                .delay(750)
-                .attr("y", (currMinHeight + orig_y).toString());
+            .transition()
+            .duration(1000)
+            .delay(750)
+            .attr("y", (currMinHeight + orig_y).toString());
         })
-}
+} 
 
 function restorePlot(d) {
 
@@ -423,95 +419,95 @@ function restorePlot(d) {
         .each(function(d) {
             var ogY = d3.select(this).attr("ogY");
             d3.select(this)
-                .transition()
-                .duration(1000)
-                .delay(750)
-                .attr("y", ogY);
-        })
-        //restore opacity of erased bars
+            .transition()
+            .duration(1000)
+            .delay(750)
+            .attr("y", ogY);
+    })
+    //restore opacity of erased bars
     for (i = 0; i < legendClassArray.length; i++) {
         if (legendClassArray[i] != color_keep) {
             //d3.select("[id='" + i + "']")
             //hist.selectAll(".rect" + legendClassArray[i])
             hist.selectAll("[color= '" + legendClassArray[i] + "']")
-                .transition()
-                .duration(1000)
-                .delay(750)
-                .attr("opacity", 1)
-                .style("opacity", 1);
+            .transition()
+            .duration(1000)
+            .delay(750)
+            .attr("opacity", 1)        
+            .style("opacity", 1);
         }
     }
-}
+  }
 
 //idk what these color functions are doing 
 function color(d) {
-    svg.selectAll(".plotEntry")
-        .filter(function(e) {
-            return d.getAttribute('name') == e.name;
-        })
-        .transition()
-        .attr('r', '6')
-        .style("fill", '#ff0011')
-        .style("opacity", 1);
+  svg.selectAll(".plotEntry")
+    .filter(function(e) {
+      return d.getAttribute('name') == e.name;
+    })
+  .transition()
+  .attr('r', '6')
+  .style("fill", '#ff0011')
+  .style("opacity", 1);
 }
 
 function uncolor(d) {
-    svg.selectAll('.plotEntry')
-        .transition()
-        .attr('r', '4')
-        .style("fill", '#ffffff')
-        .style("opacity", 0.3);
+  svg.selectAll('.plotEntry')
+    .transition()
+    .attr('r', '4')
+    .style("fill", '#ffffff')
+    .style("opacity", 0.3);
 }
 
 //not sure if these two functions here are necessary
 
 d3.queue()
-    .defer(d3.csv, 'colleges.csv', function(row) {
-        return {
-            name: row['Name'],
-            control: row['Control'],
-            region: row['Region'],
-            locale: row['Locale'],
-            admission_rate: +row['Admission Rate'],
-            act_median: +row['ACT Median'],
-            sat_average: +row['SAT Average'],
-            undergrad_pop: +row['Undergrad Population'],
-            percent_white: +row['% White'],
-            percent_black: +row['% Black'],
-            percent_hispanic: +row['% Hispanic'],
-            percent_asian: +row['% Asian'],
-            percent_amer_indian: +row['% American Indian'],
-            percent_pacific_islander: +row['% Pacific Islander'],
-            percent_biracial: +row['% Biracial'],
-            percent_aliens: +row['% Nonresident Aliens'],
-            percent_part_time_students: +row['% Part-time Undergrads'],
-            average_cost: +row['Average Cost'],
-            expenditure_per_student: +row['Expenditure Per Student'],
-            average_faculty_salary: +row['Average Faculty Salary'],
-            percent_full_time_faculty: +row['% Full-time Faculty'],
-            percent_students_with_pell: +row['% Undergrads with Pell Grant'],
-            completion_rate: +row['Completion Rate 150% time'],
-            retention_rate: +row['Retention Rate (First Time Students)'],
-            percent_older_students: +row['% Undergrads 25+ y.o.'],
-            three_year_default_rate: +row['3 Year Default Rate'],
-            median_debt: +row['Median Debt'],
-            median_debt_on_graduation: +row['Median Debt on Graduation'],
-            median_debt_on_withdrawal: +row['Median Debt on Withdrawal'],
-            percent_federal_loans: +row['% Federal Loans'],
-            percent_pell_recipients: +row['% Pell Grant Recipients'],
-            average_entry_age: +row['Average Age of Entry'],
-            average_family_income: +row['Average Family Income'],
-            median_family_income: +row['Median Family Income'],
-            poverty_rate: +row['Poverty Rate'],
-            unemployed_after_eight: +row['Number of Unemployed 8 years after entry'],
-            employed_after_eight: +row['Number of Employed 8 years after entry'],
-            mean_earnings_after_eight: +row['Mean Earnings 8 years After Entry'],
-            median_earnings_after_eight: +row['Median Earnings 8 years After Entry']
-        }
-    }).await(dotheGoodStuff);
+.defer(d3.csv, 'colleges.csv', function(row) {
+    return {
+        name: row['Name'],
+        control: row['Control'],
+        region: row['Region'],
+        locale: row['Locale'],
+        admission_rate: +row['Admission Rate'],
+        act_median: +row['ACT Median'],
+        sat_average: +row['SAT Average'],
+        undergrad_pop: +row['Undergrad Population'],
+        percent_white: +row['% White'],
+        percent_black: +row['% Black'],
+        percent_hispanic: +row['% Hispanic'],
+        percent_asian: +row['% Asian'],
+        percent_amer_indian: +row['% American Indian'],
+        percent_pacific_islander: +row['% Pacific Islander'],
+        percent_biracial: +row['% Biracial'],
+        percent_aliens: +row['% Nonresident Aliens'],
+        percent_part_time_students: +row['% Part-time Undergrads'],
+        average_cost: +row['Average Cost'],
+        expenditure_per_student: +row['Expenditure Per Student'],
+        average_faculty_salary: +row['Average Faculty Salary'],
+        percent_full_time_faculty: +row['% Full-time Faculty'],
+        percent_students_with_pell: +row['% Undergrads with Pell Grant'],
+        completion_rate: +row['Completion Rate 150% time'],
+        retention_rate: +row['Retention Rate (First Time Students)'],
+        percent_older_students: +row['% Undergrads 25+ y.o.'],
+        three_year_default_rate: +row['3 Year Default Rate'],
+        median_debt: +row['Median Debt'],
+        median_debt_on_graduation: +row['Median Debt on Graduation'],
+        median_debt_on_withdrawal: +row['Median Debt on Withdrawal'],
+        percent_federal_loans: +row['% Federal Loans'],
+        percent_pell_recipients: +row['% Pell Grant Recipients'],
+        average_entry_age: +row['Average Age of Entry'],
+        average_family_income: +row['Average Family Income'],
+        median_family_income: +row['Median Family Income'],
+        poverty_rate: +row['Poverty Rate'],
+        unemployed_after_eight: +row['Number of Unemployed 8 years after entry'],
+        employed_after_eight: +row['Number of Employed 8 years after entry'],
+        mean_earnings_after_eight: +row['Mean Earnings 8 years After Entry'],
+        median_earnings_after_eight: +row['Median Earnings 8 years After Entry']
+    }
+}).await(dotheGoodStuff);
 
 function dotheGoodStuff(error, dataset) {
-    if (error) {
+    if(error) {
         console.log("error");
         return;
     }
@@ -527,4 +523,4 @@ function dotheGoodStuff(error, dataset) {
         pop[i] = dataset[i].undergrad_pop;
     }
     //populate();
-}
+} 
