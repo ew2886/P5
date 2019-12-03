@@ -112,6 +112,10 @@ path.domain {
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
 }
 
+.card-content {
+    font-size: 14px;
+}
+
 .infobox {
     padding: 2px 16px;
 }
@@ -150,4 +154,19 @@ path.domain {
     font-size: 10px;
     font-weight: bold;
     fill: black;
+}
+
+.cardh2 {
+    margin-top: 0.3rem;
+    margin-bottom: 0.3rem;
+}
+
+.bar {
+    margin-top: 0rem;
+    margin-bottom: 16px;
+}
+
+.title {
+    margin-top: 16px;
+    margin-left: 16px;
 }
