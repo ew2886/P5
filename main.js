@@ -65,7 +65,7 @@ var legendTitle = ['Median Earnings 8 years After Entry'];
 
 var tip = d3.tip()
     .attr('class', 'd3-tip')
-    .offset([0, 0])
+    .offset([-8, 0])
     .html(function(d) {
       return d["name"];
     });
@@ -353,7 +353,7 @@ function updateChart() {
         .attr("name", function(d) { return d['name']})
         .on("mouseover", function(d) {
             //color(this);
-            d3.select(this).style("fill", "blue"); //change this color eventually 
+            d3.select(this).style("fill", "#90EE90"); //change this color eventually 
 
             tip.show(d);
         
