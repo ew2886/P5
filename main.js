@@ -394,7 +394,7 @@ function updateChart() {
             d3.select("#sACT").text(d['ACT']);
             d3.select("#sSAT").text(d['SAT']);
 
-            d3.select(".infobox").style('visibility', 'visible');
+            // d3.select(".infobox").style('visibility', 'visible');
 
             // d3.select("#sPopulation").text(d['cost']); //not working atm 
             // d3.select("#sPercent_white").text(d['percent_white']);
