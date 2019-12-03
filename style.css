@@ -101,5 +101,28 @@ path.domain {
     left: 100%;
 }
 
-© 2019 GitHub,
-Inc.
+.container {}
+
+.row {
+    display: flex;
+}
+
+.row .col {
+    flex: 1;
+    flex-direction: column;
+    display: flex;
+    justify-content: center;
+    margin: 5px;
+}
+
+.row .col svg {
+    flex: 1;
+    margin: 5px;
+}
+
+@media all and (max-width:400px) {
+    /* Change this value as per your needs */
+    .row {
+        flex-direction: column
+    }
+}

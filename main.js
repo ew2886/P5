@@ -143,7 +143,7 @@ d3.csv('./colleges.csv',
 
         hist.append('text')
             .attr('class', 'legend_title')
-            .attr('transform', function(d) { return "translate(" + [250, 130] + ") " })
+            .attr('transform', function(d) { return "translate(" + [100, 130] + ") " })
             .text('Median Earnings (USD)')
             .style('font-size', '15px')
             .attr("font-family", "Trebuchet MS");
@@ -196,7 +196,7 @@ d3.csv('./colleges.csv',
                 legendClassArray.push(d.replace(/\s/g, ''));
                 return "legend";
             })
-            .attr("transform", 'translate(' + [-400, 150] + ')')
+            .attr("transform", 'translate(' + [-550, 150] + ')')
             .on("mouseover", function() {
                 //makes cursor change
                 if (active_link === "0") d3.select(this).style("cursor", "pointer");
@@ -248,7 +248,7 @@ d3.csv('./colleges.csv',
             .data(legendHist).enter()
             .append("text")
             .attr('class', 'legend_label')
-            .attr('transform', 'translate(' + [-200, 163] + ')')
+            .attr('transform', 'translate(' + [-300, 163] + ')')
             .text(function(d) { return d })
             .attr('x', 475)
             .attr('y', function(c, i) { return i * 20 })
