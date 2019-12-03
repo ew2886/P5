@@ -249,7 +249,7 @@ d3.csv('./colleges.csv',
             .data(legendHist).enter()
             .append("text")
             .attr('class', 'legend_label')
-            .attr('transform', 'translate(' + [-300, 163] + ')')
+            .attr('transform', 'translate(' + [-350, 163] + ')')
             .text(function(d) { return d })
             .attr('x', 475)
             .attr('y', function(c, i) {return i * 20})
@@ -353,19 +353,23 @@ function updateChart() {
         .attr("name", function(d) { return d['name']})
         .on("mouseover", function(d) {
             //color(this);
-            if(d3.select(this).attr("opacity") == 1) {
-                tip.show(d);
-            }
+            d3.select(this).style("fill", "blue"); //change this color eventually 
+
+            tip.show(d);
+        
             d3.select("#sName").text(d['name']);
             d3.select("#sRegion").text(d['region']);
             d3.select("#sAdmiss").text(d['admission']);
             d3.select("#sACT").text(d['ACT']);
             d3.select("#sSAT").text(d['SAT']);
             d3.select("#sCost").text(d['cost']);
+
         })					
         .on("mouseout", function(d) {
             tip.hide(d);
             //uncolor(this);
+            d3.select(this).style("fill", function (d) { return colorScale(d['salary']); }); 
+
             d3.select("#sName").text("").append("tspan");
             d3.select("#sRegion").text("").append("tspan");
             d3.select("#sAdmiss").text("").append("tspan");
