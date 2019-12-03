@@ -502,8 +502,8 @@ function plotSingle(d) {
 
             d3.select(this)
             .transition()
-            .duration(1000)
-            .delay(750)
+            .duration(2000)
+            .delay(500)
             .attr("y", (currMinHeight + orig_y).toString());
         })
 } 
@@ -515,7 +515,8 @@ function restorePlot(d) {
             var ogY = d3.select(this).attr("ogY");
             d3.select(this)
             .transition()
-            .duration(1000)
+            .duration(2000)
+            .delay(750)
             .attr("y", ogY);
     })
     //restore opacity of erased bars
@@ -525,8 +526,8 @@ function restorePlot(d) {
             //hist.selectAll(".rect" + legendClassArray[i])
             hist.selectAll("[color= '" + legendClassArray[i] + "']")
             .transition()
-            .duration(1000)
-            .delay(750)
+            .duration(500)
+            .delay(1500)
             .attr("opacity", 1)        
             .style("opacity", 1);
         }
