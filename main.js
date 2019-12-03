@@ -368,7 +368,13 @@ function updateChart() {
         })
         .on("mouseout", function(d) {
             tip.hide(d);
-            //uncolor(this);	
+            //uncolor(this);
+            d3.select("#sName").text("");
+            d3.select("#sRegion").text("");
+            d3.select("#sAdmiss").text("");
+            d3.select("#sACT").text("");
+            d3.select("#sSAT").text("");
+            d3.select("#sCost").text("");
         });
 }
 
