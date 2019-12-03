@@ -101,8 +101,6 @@ path.domain {
     left: 100%;
 }
 
-.container {}
-
 .row {
     display: flex;
 }
@@ -129,11 +127,6 @@ path.domain {
     margin-bottom: 10px;
 }
 
-fill: none;
-stroke-width: 2px;
-stroke: black;
-
-}
 .tooltip {
     text-anchor: middle;
     font-family: sans-serif;
