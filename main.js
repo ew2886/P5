@@ -67,8 +67,13 @@ var tip = d3.tip()
     .attr('class', 'd3-tip')
     .offset([-8, 0])
     .html(function(d) {
-      return d["name"];
-    });
+        return "<div><b>Name:  </b>" + d["name"] + "</div>"
+            + "<div>Region:  " + d["region"] + "</div>"
+            + "<div>Admission Rate:  " + d["admission"] + "</div>"
+            + "<div>ACT:  " + d["ACT"] + "</div>"
+            + "<div>SAT:  " + d["SAT"] + "</div>"
+            + "<div>Average Cost:  " + d["cost"] + "</div>";;
+        });
 
 svg.call(tip);
 
@@ -85,12 +90,14 @@ d3.csv('./colleges.csv',
             admission: +d['Admission Rate'],
             ACT: +d['ACT Median'],
             SAT: +d['SAT Average'],
-            region: d.Region,
-            locale: d.Locale,
-            control: d.Control,
             cost: +d['Average Cost'],
             salary: +d['Median Earnings 8 years After Entry'],
+            // needed for on click 
             debt: +d['Median Debt on Graduation'],
+            locale: d.Locale,
+            control: d.Control,
+            region: d.Region,
+            population: +d['Undergrad Population'],
         }
     },
 
@@ -353,33 +360,24 @@ function updateChart() {
         .attr("name", function(d) { return d['name']})
         .on("mouseover", function(d) {
             //color(this);
-            d3.select(this).style("fill", "#90EE90"); //change this color eventually 
+            d3.select(this).style("fill", "#90EE90"); //change this color eventually ?? light green atm 
 
             tip.show(d);
-        
-            d3.select("#sName").text(d['name']);
-            d3.select("#sRegion").text(d['region']);
-            d3.select("#sAdmiss").text(d['admission']);
-            d3.select("#sACT").text(d['ACT']);
-            d3.select("#sSAT").text(d['SAT']);
-            d3.select("#sCost").text(d['cost']);
-
         })					
         .on("mouseout", function(d) {
             tip.hide(d);
             //uncolor(this);
             d3.select(this).style("fill", function (d) { return colorScale(d['salary']); }); 
-            
-            //probably bad practice here?
-            // d3.select("#sName").text("").append("tspan");
-            // d3.select("#sRegion").text("").append("tspan");
-            // d3.select("#sAdmiss").text("").append("tspan");
-            // d3.select("#sACT").text("").append("tspan");
-            // d3.select("#sSAT").text("").append("tspan");
-            // d3.select("#sCost").text("").append("tspan");
+
         })
         .on("click", function(d) {
-            console.log(d['name']); 
+            d3.select("#sDebt").text(d['debt']);
+            d3.select("#sRegion").text(d['region']); 
+            d3.select("#sLocale").text(d['locale']);
+            d3.select("#sControl").text(d['control']);
+            // d3.select("#sPopulation").text(d['cost']); //not working atm 
+            d3.select("#sCost").text(d['cost']); 
+
             d3.select(".infobox").style('visibility', 'visible');
         });
 }
