@@ -46,11 +46,11 @@ var colorScale = d3.scaleQuantize()
     // #FFA15A:  (2) [36000, 44000]
     // #FF6496:  (2) [44000, 52000]
     // #EC02E2:  (2) [52000, 60000]
-console.log("#FFFF02: ",colorScale.invertExtent("#FFFF02"));//returns [25, 37.5]
-console.log("#FED825: ",colorScale.invertExtent("#FED825"));//returns [25, 37.5]
-console.log("#FFA15A: ",colorScale.invertExtent("#FFA15A"));//returns [25, 37.5]
-console.log("#FF6496: ",colorScale.invertExtent("#FF6496"));//returns [25, 37.5]
-console.log("#EC02E2: ",colorScale.invertExtent("#EC02E2"));//returns [25, 37.5]
+// console.log("#FFFF02: ",colorScale.invertExtent("#FFFF02"));//returns [25, 37.5]
+// console.log("#FED825: ",colorScale.invertExtent("#FED825"));//returns [25, 37.5]
+// console.log("#FFA15A: ",colorScale.invertExtent("#FFA15A"));//returns [25, 37.5]
+// console.log("#FF6496: ",colorScale.invertExtent("#FF6496"));//returns [25, 37.5]
+// console.log("#EC02E2: ",colorScale.invertExtent("#EC02E2"));//returns [25, 37.5]
 
 // var plot = svg.append('g')
 //     .attr('class', 'plot')
@@ -77,7 +77,6 @@ var y_orig; //to store original y-posn
 d3.csv('./colleges.csv',
     function(d){
         // This callback formats each row of the data
-        //console.log("I'm in the first csv function");
         return {
             name: d.Name,
             admission: +d['Admission Rate'],
@@ -93,7 +92,6 @@ d3.csv('./colleges.csv',
     },
 
     function(error, dataset){
-        //console.log("I'm in the second csv function");
         if(error) {
             return;
         }
@@ -114,7 +112,7 @@ d3.csv('./colleges.csv',
 
         ``//TODO: probably change fonts too
         yHistScale = d3.scaleLinear()
-            .domain([0, 60])
+            .domain([0, 40])
             .range([chartHeight * .8, 0]);
 
         svg.append('g') // Append a g element for the scale
@@ -270,8 +268,6 @@ var arrayofrects = [];
 var counting = 0; 
 var dots; 
 function updateChart() {
-    //console.log("I'm in updateChart");
-
     var costRange;
     var ACTRange;
     var SATRange;
@@ -281,7 +277,6 @@ function updateChart() {
 
     var filteredStats = stats.filter(function(d) {return true;});
 
-    console.log(xHistScale.ticks());
     bins = d3.histogram()
         .domain(xHistScale.domain())
         .thresholds(xHistScale.ticks(100)) //50 or 100?
@@ -321,9 +316,9 @@ function updateChart() {
 
     dotsEnter = dots.enter()
         .append("rect")
+        .attr("class", "rect")
         .attr("x", 0)
         .attr("y", function(d, i) {
-                //console.log(d.name);
                 arrayofrects[counting] = d.name;
                 counting++;
                 //so rn the top square is abnormally larger
@@ -334,11 +329,12 @@ function updateChart() {
         })
         .attr("width", 10)
         .attr("height", 10)
+        .attr("color", function(d) {return colorScale(d['salary']); })
         .style("stroke", "white")
         .style("fill", function(d) {return colorScale(d['salary']); })
         .attr("name", function(d) { return d['name']})
         .on("mouseover", function(d) {
-            color(this);
+            //color(this);
             tip.show(d);
             d3.select("#sName").text(d['name']);
             d3.select("#sRegion").text(d['region']);
@@ -349,57 +345,103 @@ function updateChart() {
         })					
         .on("mouseout", function(d) {
             tip.hide(d);
-            uncolor(this);	
+            //uncolor(this);	
         });
 }
 
+colorRects = []
+
 function plotSingle(d) {
-    class_keep = d.id.split("id").pop();
-    idx = legendClassArray.indexOf(class_keep);    
+    var color_keep = d3.select(d).attr("fill");
    
+    console.log(legendClassArray);
     //erase all but selected bars by setting opacity to 0
     for (i = 0; i < legendClassArray.length; i++) {
-      if (legendClassArray[i] != class_keep) {
-        d3.selectAll(".class" + legendClassArray[i])
+      if (legendClassArray[i] != color_keep) {
+          console.log(legendClassArray[i]);
+          //d3.select("[id='" + i + "']")
+          //hist.selectAll(".rect" + legendClassArray[i])
+          hist.selectAll("[color= '" + legendClassArray[i] + "']")
           .transition()
           .duration(1000)          
           .style("opacity", 0);
       }
     }
+    var b = hist.selectAll(".rect").each(function(d, i) {
+        console.log(i, d);
+        console.log(d[0]);
+        console.log(d3.select(this));
+    });
+    
+    // var b = hist.selectAll(".gBin").each(function(d, i) {
+    //     console.log(i, d);
+    //     console.log(d[0]);
+    //     console.log(d3.select(d));
+    // });
+    var recs = b.selectAll(".rect");
+    var binCount = 0;
+    
+    var squares = hist.selectAll("[color= '" + color_keep + "']")
+        .each(function(d) {
+            orig_y = parseInt(d3.select(this).attr("y"));
+            height = parseInt(d3.select(this).attr("height"));
+            idx = parseInt(d["idx"]);
+
+            //then this line becomes wonky
+            //d3.select(this).attr("y", (orig_y + height * idx).toString());
+        })
 
     //lower the bars to start on x-axis
     y_orig = [];
-    //console.log(hist.selectAll(".gBin"));
-    var squares = hist.selectAll(".gBin");
+    // squares.nodes().forEach( function(d, i) {
+    //     console.log(d3.select(d).attr("y"));
+    //     console.log(i);
+    //     //console.log(d3.select(this).attr("y"));
+    //     // col = d3.select(this).attr("color");
+    //     // if(col !== color_keep) {
+    //     //     console.log("disappear!");
+    //     //     d3.select(this).style("opacity", 0);
+    //     // }
+    //     //console.log(d3.select(this).attr("y"));
+    //     //console.log(this);
+    //     y_orig = d3.select(d).attr("y");
+    //     // console.log(y_orig);
+    //     //y_new = y_orig - d3.select(this).attr("height");
+    //     //console.log("y_orig", y_orig, "y_new", y_new);
 
-    squares.each( function(d, i) {
-        console.log("why dun this work"); 
-        console.log(d); 
-    });
+    //     d3.select(d)
+    //     .transition()
+    //     .duration(1000)
+    //     .delay(750)
+    //     .style("opacity", 1)
+    //     .attr("y", (y_orig + (chartHeight - y_orig)));
 
-    squares.nodes().forEach(function(d, i) {
-        var nodes = d.childNodes;
-        console.log(nodes);
-        //get height and y posn of base bar and selected bar
-        h_keep = d3.select(nodes[idx]).attr("height");
-        y_keep = d3.select(nodes[idx]).attr("y");
+    //     // console.log(y_orig, d3.select(this).attr("y"));
+    // });
 
-        h_base = d3.select(nodes[0]).attr("height");
-        y_base = d3.select(nodes[0]).attr("y");
+    // squares.nodes().forEach(function(d, i) {
+    //     var nodes = d.childNodes;
+    //     console.log(nodes);
+    //     //get height and y posn of base bar and selected bar
+    //     h_keep = d3.select(nodes[idx]).attr("height");
+    //     y_keep = d3.select(nodes[idx]).attr("y");
 
-        h_shift = h_keep - h_base;
-        y_new = y_base - h_shift;
+    //     h_base = d3.select(nodes[0]).attr("height");
+    //     y_base = d3.select(nodes[0]).attr("y");
+
+    //     h_shift = h_keep - h_base;
+    //     y_new = y_base - h_shift;
 
 
-      //reposition selected bars
-      d3.select(d[idx])
-        .transition()
-        .ease("bounce")
-        .duration(1000)
-        .delay(750)
-        .attr("y", y_new);
+    //   //reposition selected bars
+    //   d3.select(d[idx])
+    //     .transition()
+    //     .ease("bounce")
+    //     .duration(1000)
+    //     .delay(750)
+    //     .attr("y", y_new);
    
-    })    
+    // })    
 } 
 
 function restorePlot(d) {
@@ -411,7 +453,6 @@ function restorePlot(d) {
         .duration(1000)        
         .attr("y", y_orig[i]);
     })
-
     //restore opacity of erased bars
     for (i = 0; i < legendClassArray.length; i++) {
       if (legendClassArray[i] != class_keep) {
@@ -449,8 +490,6 @@ function uncolor(d) {
 
 d3.queue()
 .defer(d3.csv, 'colleges.csv', function(row) {
-    
-    //console.log("I'm in the queue and defer function");
     return {
         name: row['Name'],
         control: row['Control'],
@@ -495,7 +534,6 @@ d3.queue()
 }).await(dotheGoodStuff);
 
 function dotheGoodStuff(error, dataset) {
-    //console.log("I'm in the doGoodStuff function");
     if(error) {
         console.log("error");
         return;
