@@ -279,32 +279,10 @@ d3.csv('./colleges.csv',
         //   regionsArr.push(tempObj);
         // });
 
-        var regions = d3.map(stats, function(d) {
-            return d.region;
-        }).keys();
         var minACT; 
         var maxACT;
         var minSAT;
         var maxACT;
-
-        regionDropdown = d3.select("#regionSelect")
-                    .on("change", function(d) {
-                        var reg = d3.select(this).property("value");
-                        var test = hist.selectAll("[region= '" + reg + "']");
-                        hist.selectAll('.rect')
-                            .filter(function(d) {
-                                return d.region !== reg;
-                        })
-                        .style("fill", "gray");
-                    });
-
-        regionDropdown.selectAll("option")
-                    .data(regions)
-                    .enter().append("option")
-                    .attr("value", function (d) {return d;})
-                    .text(function (d) {
-                        return d;
-                    });
 
         d3.select("#minACT")
             .append('input')
