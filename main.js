@@ -330,7 +330,7 @@ d3.csv('./colleges.csv',
                     //     //     return false
                     //     // } 
                     // }
-                    return !(d.ACT >= maxACT || d.ACT <= minACT)
+                    return !(d.ACT > maxACT || d.ACT < minACT)
                 })
                 .style("fill", function (d) {
                     return colorScale(d.salary);
@@ -341,7 +341,7 @@ d3.csv('./colleges.csv',
             //now greying out those that are not in range 
             var testing = hist.selectAll('.rect')
                 .filter(function(d) {
-                    if(d.ACT >= maxACT || d.ACT <= minACT) { 
+                    if(d.ACT > maxACT || d.ACT < minACT) { 
                         // if its not in filtered list add it 
                         if (!filterList.includes(d)) {
                             filterList.push(d)
@@ -383,7 +383,7 @@ d3.csv('./colleges.csv',
                     //         return false 
                     //     }
                     // }
-                    return !(d.SAT >= maxSAT || d.SAT <= minSAT)
+                    return !(d.SAT > maxSAT || d.SAT < minSAT)
                 })
                 .style("fill", function (d) {
                     return colorScale(d.salary);
