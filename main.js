@@ -431,8 +431,11 @@ function updateChart() {
         .attr("name", function(d) { return d['name']})
         .on("mouseover", function(d) {
             //color(this);
+            if (d3.select(this).attr("opacity") == 1) {
+                tip.show(d);
+            }
             d3.select(this).style("fill", "#90EE90"); //change this color eventually ?? light green atm 
-            tip.show(d);
+
         })					
         .on("mouseout", function(d) {
             tip.hide(d);
