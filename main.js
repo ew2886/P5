@@ -34,6 +34,7 @@ var graphPlace;
 var regionDropdown; 
 var actDropdown;
 var satDropdown;
+var legendPlace;
 
 //why is this reversing here
 //also these colors really ugly lol i just chose a random palette 
@@ -148,6 +149,10 @@ d3.csv('./colleges.csv',
         graphPlace = hist.append('g')
             .attr('class', 'graphPlace')
             .attr("transform", function(d) { return "translate(" + "0" + ",0)"; });
+        legendPlace = hist.append('g')
+            .attr('class', 'graphPlace')
+            .attr("transform", function(d) { return "translate(" + "0" + ",0)"; });
+
 
         hist.append('text')
             .attr('class', 'hist_y_axis_label')
@@ -193,7 +198,7 @@ d3.csv('./colleges.csv',
         //     return d.salary;
         // });
 
-        var legend = hist.selectAll(".legend")
+        var legend = legendPlace.selectAll(".legend")
             .data(valueColors.slice().reverse()).enter()
             .append("rect")
             .attr("fill", function (color){ return color; })
@@ -211,8 +216,8 @@ d3.csv('./colleges.csv',
                 //makes cursor change
                 if (active_link === "0") d3.select(this).style("cursor", "pointer");
                 else {
-                    if (active_link.split("class").pop() === this.id.split("id").pop()) {
-                    d3.select(this).style("cursor", "pointer");
+                    if (active_link === d3.select(this).attr("fill")) {
+                        d3.select(this).style("cursor", "pointer");
                     } else d3.select(this).style("cursor", "auto");
                 }
             })
@@ -222,19 +227,22 @@ d3.csv('./colleges.csv',
                     .style("stroke", "black")
                     .style("stroke-width", 2);
         
-                    active_link = this.id.split("id").pop();
+                    active_link = d3.select(this).attr("fill")
                     plotSingle(this);
         
                     //gray out the others
                     for (i = 0; i < legendClassArray.length; i++) {
                       if (legendClassArray[i] != active_link) {
-                        d3.select("#id" + legendClassArray[i])
+                        legendPlace.selectAll("[fill= '" + legendClassArray[i] + "']")
                           .style("opacity", 0.5);
                       }
                     }
+                    
                    
                 } else { //deactivate
-                  if (active_link === this.id.split("id").pop()) {//active square selected; turn it OFF
+                    console.log(active_link);
+                    console.log(this);
+                  if (active_link === d3.select(this).attr("fill")) {//active square selected; turn it OFF
                     d3.select(this)           
                       .style("stroke", "none");
         
@@ -242,7 +250,7 @@ d3.csv('./colleges.csv',
         
                     //restore remaining boxes to normal opacity
                     for (i = 0; i < legendClassArray.length; i++) {              
-                        d3.select("#id" + legendClassArray[i])
+                        legendPlace.selectAll("[fill= '" + legendClassArray[i] + "']")
                           .style("opacity", 1);
                     }
         
