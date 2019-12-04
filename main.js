@@ -31,6 +31,9 @@ var xHistScale;
 var yHistScale;
 var hist;
 var graphPlace; 
+var regionDropdown; 
+var actDropdown;
+var satDropdown;
 
 //why is this reversing here
 //also these colors really ugly lol i just chose a random palette 
@@ -190,19 +193,6 @@ d3.csv('./colleges.csv',
         //     return d.salary;
         // });
 
-        //TODO: 
-        //this isn't being used rn maybe we can use for some filtering
-        var regions = d3.nest()
-            .key(function(d) { return d.region; })
-            .entries(dataset);
-        var regionsArr = [];
-        regions.forEach(function(e) {
-          var tempObj = {}
-          tempObj.label = e.key;
-          tempObj.selected = true;
-          regionsArr.push(tempObj);
-        });
-
         var legend = hist.selectAll(".legend")
             .data(valueColors.slice().reverse()).enter()
             .append("rect")
@@ -277,8 +267,69 @@ d3.csv('./colleges.csv',
         //console.log("regionsArr: ", regionsArr)
         updateChart();
 
-    });
+        //TODO: 
+        //this isn't being used rn maybe we can use for some filtering
+        // var regions = d3.nest()
+        //     .key(function(d) { return d.region; });
+        // var regionsArr = [];
+        // regions.forEach(function(e) {
+        //   var tempObj = {}
+        //   tempObj.label = e.key;
+        //   tempObj.selected = true;
+        //   regionsArr.push(tempObj);
+        // });
 
+        var minACT; 
+        var maxACT;
+        var minSAT;
+        var maxACT;
+
+        d3.select("#minACT")
+            .append('input')
+            .attr('type', 'number')
+            .on('input', function() {
+                minACT = this.value;
+            })
+        d3.select("#maxACT")
+            .append('input')
+            .attr('type', 'number')
+            .on('input', function() {
+                maxACT = this.value; 
+            })
+        d3.select("#filterACT").on("click", function(d) {
+            var testing = hist.selectAll('.rect')
+                .filter(function(d) {
+                    return d.ACT >= maxACT || d.ACT <= minACT;
+            })
+            .style("fill", "gray");
+        });
+        d3.select("#minSAT")
+            .append('input')
+            .attr('type', 'number')
+            .on('input', function() {
+                minSAT = this.value;
+            })
+        d3.select("#maxSAT")
+            .append('input')
+            .attr('type', 'number')
+            .on('input', function() {
+                maxSAT = this.value; 
+            })
+        d3.select("#filterSAT").on("click", function(d) {
+            var testing = hist.selectAll('.rect')
+                .filter(function(d) {
+                    return d.SAT >= maxSAT || d.SAT <= minSAT;
+            })
+            .style("fill", "gray");
+        });
+        reset = d3.select("#reset").on("click", function() {
+            hist.selectAll('.rect')
+                .style("fill", function(d) {
+                    return colorScale(d.salary);
+                });
+        });
+
+    });
 
 //function updateChart(SATRange, ACTRange, regions, sizeRange, costRange) {
 var bins;
@@ -457,7 +508,6 @@ function restorePlot(d) {
             d3.select(this)
             .transition()
             .duration(1000)
-            .delay(750)
             .attr("y", ogY);
     })
     //restore opacity of erased bars
