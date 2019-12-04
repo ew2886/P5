@@ -1,19 +1,6 @@
 var data_set =[];
-var hello = [];
-var control = [];
 var locale = [];
-// var white = [];
-// var black = [];
-// var hispanic = [];
-// var asian = [];
-// var americanIndian = [];
-// var pacfic = [];
-// var biracial = [];
 var cost = [];
-var earnings = [];
-var debt = [];
-var pop = [];
-var colors = ["gray", '#996600', '#660066', "#003300", '#003366', '#C8C8C8', '#000000', '#680000']
 
 var binContainer = []; 
 
@@ -38,18 +25,9 @@ var actDropdown;
 var satDropdown;
 var legendPlace;
 
-// var maxSAT = 2400; 
-// var minSAT = 0; 
-
-// var minACT = 0; 
-// var maxACT = 36; 
-
-//why is this reversing here
-//also these colors really ugly lol i just chose a random palette 
 var valueColors = ['#FFFF02', '#FED825', '#FFA15A', '#FF6496',  '#EC02E2'];
 var reversedColors = valueColors.slice().reverse();
 
-//what's the domain here for?
 var colorScale = d3.scaleQuantize()
       .domain([20000, 60000]) //15000, 65000
       .range(valueColors);
@@ -60,18 +38,7 @@ var colorScale = d3.scaleQuantize()
     // #FFA15A:  (2) [36000, 44000]
     // #FF6496:  (2) [44000, 52000]
     // #EC02E2:  (2) [52000, 60000]
-// console.log("#FFFF02: ",colorScale.invertExtent("#FFFF02"));//returns [25, 37.5]
-// console.log("#FED825: ",colorScale.invertExtent("#FED825"));//returns [25, 37.5]
-// console.log("#FFA15A: ",colorScale.invertExtent("#FFA15A"));//returns [25, 37.5]
-// console.log("#FF6496: ",colorScale.invertExtent("#FF6496"));//returns [25, 37.5]
-// console.log("#EC02E2: ",colorScale.invertExtent("#EC02E2"));//returns [25, 37.5]
 
-// var plot = svg.append('g')
-//     .attr('class', 'plot')
-//     .attr("transform", function(d) {return 'translate(' + [100, 100]+')'; });
-
-
-//TODO: need to rethink stuff with leged 
 var legendHist = ['$52k+', '$44k-$52k', '$36k-$44k', '$28k-$36k', '< $28k'];
 var legendTitle = ['Median Earnings 8 years After Entry'];
 
@@ -197,15 +164,6 @@ d3.csv('./colleges.csv',
         })
         stats = dataset;
 
-        //TODO: not sure if we need these max and min salaries 
-        // var maxSalary = d3.max(dataset, function(d){
-        //     return d.salary;
-        // });
-
-        // var minSalary = d3.min(dataset, function(d){
-        //     return d.salary;
-        // });
-
         var legend = legendPlace.selectAll(".legend")
             .data(valueColors.slice().reverse()).enter()
             .append("rect")
@@ -282,18 +240,6 @@ d3.csv('./colleges.csv',
             .attr("font-family", "Trebuchet MS");
         //console.log("regionsArr: ", regionsArr)
         updateChart();
-
-        //TODO: 
-        //this isn't being used rn maybe we can use for some filtering
-        // var regions = d3.nest()
-        //     .key(function(d) { return d.region; });
-        // var regionsArr = [];
-        // regions.forEach(function(e) {
-        //   var tempObj = {}
-        //   tempObj.label = e.key;
-        //   tempObj.selected = true;
-        //   regionsArr.push(tempObj);
-        // });
 
         var minACT; 
         var maxACT;
@@ -427,12 +373,6 @@ var arrayofrects = [];
 var counting = 0; 
 var dots; 
 function updateChart() {
-    var costRange;
-    var ACTRange;
-    var SATRange;
-    var regionsVal = [];
-    var localeVal = [];
-    var controls = [];
 
     var filteredStats = stats.filter(function(d) {return true;});
 
@@ -460,10 +400,6 @@ function updateChart() {
             return i;
         });
 
-    // dotBinsEnter.attr("class", "gBin")
-    //     .attr("transform", function(d){ return 'translate(' + [xHistScale(d.x0), padding.b] + ')'; });
-
-    //what is this doing tbh 
     dots = dotBinsEnter.selectAll(".dot")
         .data((d, a) => d.map((p, i) => {
             return {idx: i,
@@ -492,10 +428,6 @@ function updateChart() {
         .attr("y", function(d, i) {
                 arrayofrects[counting] = d.name;
                 counting++;
-                //so rn the top square is abnormally larger
-                //than the rest of the ones in the histogram? 
-                //it becomes the same size if you do i * 1.2
-                //but then it extends past the y axis
                 return yHistScale(i) + 70
         })
         .attr("ogY", function(d, i) {
@@ -628,89 +560,3 @@ function restorePlot(d) {
         }
     }
   }
-
-//idk what these color functions are doing 
-function color(d) {
-  svg.selectAll(".plotEntry")
-    .filter(function(e) {
-      return d.getAttribute('name') == e.name;
-    })
-  .transition()
-  .attr('r', '6')
-  .style("fill", '#ff0011')
-  .style("opacity", 1);
-}
-
-function uncolor(d) {
-  svg.selectAll('.plotEntry')
-    .transition()
-    .attr('r', '4')
-    .style("fill", '#ffffff')
-    .style("opacity", 0.3);
-}
-
-//not sure if these two functions here are necessary
-
-d3.queue()
-.defer(d3.csv, 'colleges.csv', function(row) {
-    return {
-        name: row['Name'],
-        control: row['Control'],
-        region: row['Region'],
-        locale: row['Locale'],
-        admission_rate: +row['Admission Rate'],
-        act_median: +row['ACT Median'],
-        sat_average: +row['SAT Average'],
-        undergrad_pop: +row['Undergrad Population'],
-        percent_white: +row['% White'],
-        percent_black: +row['% Black'],
-        percent_hispanic: +row['% Hispanic'],
-        percent_asian: +row['% Asian'],
-        percent_amer_indian: +row['% American Indian'],
-        percent_pacific_islander: +row['% Pacific Islander'],
-        percent_biracial: +row['% Biracial'],
-        percent_aliens: +row['% Nonresident Aliens'],
-        percent_part_time_students: +row['% Part-time Undergrads'],
-        average_cost: +row['Average Cost'],
-        expenditure_per_student: +row['Expenditure Per Student'],
-        average_faculty_salary: +row['Average Faculty Salary'],
-        percent_full_time_faculty: +row['% Full-time Faculty'],
-        percent_students_with_pell: +row['% Undergrads with Pell Grant'],
-        completion_rate: +row['Completion Rate 150% time'],
-        retention_rate: +row['Retention Rate (First Time Students)'],
-        percent_older_students: +row['% Undergrads 25+ y.o.'],
-        three_year_default_rate: +row['3 Year Default Rate'],
-        median_debt: +row['Median Debt'],
-        median_debt_on_graduation: +row['Median Debt on Graduation'],
-        median_debt_on_withdrawal: +row['Median Debt on Withdrawal'],
-        percent_federal_loans: +row['% Federal Loans'],
-        percent_pell_recipients: +row['% Pell Grant Recipients'],
-        average_entry_age: +row['Average Age of Entry'],
-        average_family_income: +row['Average Family Income'],
-        median_family_income: +row['Median Family Income'],
-        poverty_rate: +row['Poverty Rate'],
-        unemployed_after_eight: +row['Number of Unemployed 8 years after entry'],
-        employed_after_eight: +row['Number of Employed 8 years after entry'],
-        mean_earnings_after_eight: +row['Mean Earnings 8 years After Entry'],
-        median_earnings_after_eight: +row['Median Earnings 8 years After Entry']
-    }
-}).await(dotheGoodStuff);
-
-function dotheGoodStuff(error, dataset) {
-    if(error) {
-        console.log("error");
-        return;
-    }
-    data_set = dataset;
-    //doStuff();
-    for (var i = 0; i < dataset.length; i++) {
-        hello[i] = dataset[i].name;
-        control[i] = dataset[i].control;
-        locale[i] = dataset[i].locale;
-        cost[i] = dataset[i].average_cost;
-        earnings[i] = dataset[i].median_earnings_after_eight;
-        debt[i] = dataset[i].median_debt;
-        pop[i] = dataset[i].undergrad_pop;
-    }
-    //populate();
-} 
