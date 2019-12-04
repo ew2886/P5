@@ -271,7 +271,6 @@ d3.csv('./colleges.csv',
                     .on("change", function(d) {
                         var reg = d3.select(this).property("value");
                         var test = hist.selectAll("[region= '" + reg + "']");
-                        console.log(test);
                         hist.selectAll('.rect')
                             .filter(function(d) {
                                 return d.region !== reg;
@@ -289,8 +288,8 @@ d3.csv('./colleges.csv',
 
         actDropdown = d3.select("#actSelect")
             .on("change", function() {
-                console.log(d3.select(this));
-                console.log(d3.select(this).property("option"));
+                var selected = d3.select("#actSelect").node();
+                console.log( selected );
             });
         actDropdown.selectAll("option")
                     .data(ACTscores)
@@ -301,7 +300,7 @@ d3.csv('./colleges.csv',
                         return d[0] + " - " + d[1];
                     });
 
-        satDropdown = d3.select("#satSelect").on("change", dropdownChange());
+        satDropdown = d3.select("#satSelect").on("change", console.log("stop"));
         satDropdown.selectAll("option")
                     .data(SATscores)
                   .enter().append("option")
@@ -312,17 +311,13 @@ d3.csv('./colleges.csv',
                     .text(function (d) {
                         return d[0] + " - " + d[1];
                     });
-
-        d3.select("#reset")
-            .on("click", function() {
-                hist.selectAll(".rect")
-                    .transition()
-                    .duration(500)
-                    .style('fill', function(d) {
-                        console.log(d);
-                        return colorScale(d.salary);
-                    })
-            })
+        
+        d3.select("#reset").on("click", function(d) {
+            hist.selectAll('.rect')
+                .style("fill", function(d) {
+                    return colorScale(d.salary);
+                });
+        });
 
     });
 
