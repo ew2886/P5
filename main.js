@@ -17,6 +17,8 @@ var colors = ["gray", '#996600', '#660066', "#003300", '#003366', '#C8C8C8', '#0
 
 var binContainer = []; 
 
+var filterList = []
+
 var svg = d3.select('#svg1');
 
 var svgWidth = 3000;
@@ -307,9 +309,13 @@ d3.csv('./colleges.csv',
         d3.select("#filterACT").on("click", function(d) {
             var testing = hist.selectAll('.rect')
                 .filter(function(d) {
-                    return d.ACT >= maxACT || d.ACT <= minACT;
+                    if(d.ACT >= maxACT || d.ACT <= minACT) { 
+                        filterList.push(d)
+                        return d.ACT >= maxACT || d.ACT <= minACT 
+                    };
             })
-            .style("fill", "gray");
+            .style("fill", "#c6c6c6");
+            console.log(filterList)
         });
         d3.select("#minSAT")
             .append('input')
@@ -326,13 +332,20 @@ d3.csv('./colleges.csv',
         d3.select("#filterSAT").on("click", function(d) {
             var testing = hist.selectAll('.rect')
                 .filter(function(d) {
-                    return d.SAT >= maxSAT || d.SAT <= minSAT;
+                    if(d.SAT >= maxSAT || d.SAT <= minSAT) {
+                        filterList.push(d)
+                        return d.SAT >= maxSAT || d.SAT <= minSAT;
+                    }
             })
-            .style("fill", "gray");
+            .style("fill", "#c6c6c6");
+            console.log(filterList); 
         });
         reset = d3.select("#reset").on("click", function() {
+            filterList = []; 
+            console.log(filterList)
             hist.selectAll('.rect')
                 .style("fill", function(d) {
+                    
                     return colorScale(d.salary);
                 });
         });
@@ -439,7 +452,20 @@ function updateChart() {
         })					
         .on("mouseout", function(d) {
             tip.hide(d);
-            d3.select(this).style("fill", function (d) { return colorScale(d['salary']); });
+            d3.select(this).style("fill", function (d) { 
+                console.log(d)
+                var greyOut = false; 
+                filterList.forEach(element => {
+                    if (element['name'] == d["name"]) {
+                        greyOut = true; 
+                    } 
+                }); 
+                if (greyOut) { 
+                    return "#c6c6c6"; 
+                }
+                return colorScale(d['salary']); 
+
+            });
             //uncolor(this) here? i think we should re color all during mouse over;
         })
         .on("click", function(d) {
