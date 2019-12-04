@@ -38,6 +38,12 @@ var actDropdown;
 var satDropdown;
 var legendPlace;
 
+var maxSAT = 2400; 
+var minSAT = 0; 
+
+var minACT = 0; 
+var maxACT = 36; 
+
 //why is this reversing here
 //also these colors really ugly lol i just chose a random palette 
 var valueColors = ['#FFFF02', '#FED825', '#FFA15A', '#FF6496',  '#EC02E2'];
@@ -297,55 +303,105 @@ d3.csv('./colleges.csv',
         d3.select("#minACT")
             .append('input')
             .attr('type', 'number')
+            .attr('class', 'inputFields')
             .on('input', function() {
                 minACT = this.value;
             })
         d3.select("#maxACT")
             .append('input')
             .attr('type', 'number')
+            .attr('class', "inputFields")
             .on('input', function() {
                 maxACT = this.value; 
             })
         d3.select("#filterACT").on("click", function(d) {
+
+            d3.selectAll(".inputFields").property("disabled", true); 
+
+            hist.selectAll('.rect')
+                .filter(function (d) {
+                    // if (!(d.ACT >= maxACT || d.ACT <= minACT)) {
+                    //     //if in filter list than it was greyed by SAT already and should remain there even if it satisfies the ACT req 
+                    //     // if (filterList.includes(d)) {
+                    //     //     return false
+                    //     // } 
+                    // }
+                    return !(d.ACT >= maxACT || d.ACT <= minACT)
+                })
+                .style("fill", function (d) {
+                    return colorScale(d.salary);
+                });
+
+
+            console.log(filterList)
+            //now greying out those that are not in range 
             var testing = hist.selectAll('.rect')
                 .filter(function(d) {
                     if(d.ACT >= maxACT || d.ACT <= minACT) { 
-                        filterList.push(d)
-                        return d.ACT >= maxACT || d.ACT <= minACT 
+                        // if its not in filtered list add it 
+                        if (!filterList.includes(d)) {
+                            filterList.push(d)
+                        } 
                     };
+                    return d.ACT >= maxACT || d.ACT <= minACT 
             })
             .style("fill", "#c6c6c6");
+
             console.log(filterList)
+
+            //first recolor those that are in range on ACT for sure and maybe SAT 
+           
         });
         d3.select("#minSAT")
             .append('input')
             .attr('type', 'number')
+            .attr('class', "inputFields")
             .on('input', function() {
                 minSAT = this.value;
             })
         d3.select("#maxSAT")
             .append('input')
             .attr('type', 'number')
+            .attr('class',"inputFields")
             .on('input', function() {
                 maxSAT = this.value; 
             })
         d3.select("#filterSAT").on("click", function(d) {
+
+            d3.selectAll(".inputFields").property("disabled", true); 
+
+            hist.selectAll('.rect')
+                .filter(function (d) {
+                    // if (!(d.SAT >= maxSAT || d.SAT <= minSAT)) {
+                    //     if (filterList.includes(d)) { 
+                    //         return false 
+                    //     }
+                    // }
+                    return !(d.SAT >= maxSAT || d.SAT <= minSAT)
+                })
+                .style("fill", function (d) {
+                    return colorScale(d.salary);
+                }); 
+            
             var testing = hist.selectAll('.rect')
                 .filter(function(d) {
                     if(d.SAT >= maxSAT || d.SAT <= minSAT) {
-                        filterList.push(d)
-                        return d.SAT >= maxSAT || d.SAT <= minSAT;
+                        if (!filterList.includes(d)) {
+                            filterList.push(d)
+                        }
                     }
+                    return d.SAT >= maxSAT || d.SAT <= minSAT;
             })
             .style("fill", "#c6c6c6");
             console.log(filterList); 
         });
         reset = d3.select("#reset").on("click", function() {
+            d3.selectAll(".inputFields").property("disabled", false); 
+
             filterList = []; 
             console.log(filterList)
             hist.selectAll('.rect')
                 .style("fill", function(d) {
-                    
                     return colorScale(d.salary);
                 });
         });
