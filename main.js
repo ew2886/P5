@@ -259,13 +259,16 @@ d3.csv('./colleges.csv',
         //   tempObj.selected = true;
         //   regionsArr.push(tempObj);
         // });
+
         var regions = d3.map(stats, function(d) {
             return d.region;
         }).keys();
-        
-
-        var ACTscores = [[15, 17], [18, 20], [21, 23], [24, 26], [26, 28], [28, 29],[30, 31], [32, 34]]
-        var SATscores = [[700, 800], [801, 900], [901, 1000], [1001, 1100], [1101, 1200], [1201, 130], [1301, 1400], [1401, 1500], [1501, 1600]]
+        var ACTscores = [[15, 17], [18, 20], [21, 23], [24, 26], [26, 28], [28, 29],[30, 31], [32, 34]];
+        var SATscores = [[700, 800], [801, 900], [901, 1000], [1001, 1100], [1101, 1200], [1201, 130], [1301, 1400], [1401, 1500], [1501, 1600]];
+        var minACT; 
+        var maxACT;
+        var minSAT;
+        var maxACT;
 
         regionDropdown = d3.select("#regionSelect")
                     .on("change", function(d) {
@@ -286,32 +289,44 @@ d3.csv('./colleges.csv',
                         return d;
                     });
 
-        actDropdown = d3.select("#actSelect")
-            .on("change", function() {
-                var selected = d3.select("#actSelect").node();
-                console.log( selected );
-            });
-        actDropdown.selectAll("option")
-                    .data(ACTscores)
-                    .enter().append("option")
-                    .attr("minValue", function(d) {return d[0];})
-                    .attr("maxValue", function(d) {return d[1]})
-                    .text(function (d) {
-                        return d[0] + " - " + d[1];
-                    });
-
-        satDropdown = d3.select("#satSelect").on("change", console.log("stop"));
-        satDropdown.selectAll("option")
-                    .data(SATscores)
-                  .enter().append("option")
-                    .attr("minValue", function(d) {
-                        return d[0];
-                    })
-                    .attr("maxValue", function(d) {return d[1];})
-                    .text(function (d) {
-                        return d[0] + " - " + d[1];
-                    });
-        
+        d3.select("#minACT")
+            .append('input')
+            .attr('type', 'number')
+            .on('input', function() {
+                minACT = this.value;
+            })
+        d3.select("#maxACT")
+            .append('input')
+            .attr('type', 'number')
+            .on('input', function() {
+                maxACT = this.value; 
+            })
+        d3.select("#filterACT").on("click", function(d) {
+            var testing = hist.selectAll('.rect')
+                .filter(function(d) {
+                    return d.ACT >= maxACT || d.ACT <= minACT;
+            })
+            .style("fill", "gray");
+        });
+        d3.select("#minSAT")
+            .append('input')
+            .attr('type', 'number')
+            .on('input', function() {
+                minSAT = this.value;
+            })
+        d3.select("#maxSAT")
+            .append('input')
+            .attr('type', 'number')
+            .on('input', function() {
+                maxSAT = this.value; 
+            })
+        d3.select("#filterSAT").on("click", function(d) {
+            var testing = hist.selectAll('.rect')
+                .filter(function(d) {
+                    return d.SAT >= maxSAT || d.SAT <= minSAT;
+            })
+            .style("fill", "gray");
+        });
         d3.select("#reset").on("click", function(d) {
             hist.selectAll('.rect')
                 .style("fill", function(d) {
