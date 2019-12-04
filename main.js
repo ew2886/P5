@@ -38,11 +38,11 @@ var actDropdown;
 var satDropdown;
 var legendPlace;
 
-var maxSAT = 2400; 
-var minSAT = 0; 
+// var maxSAT = 2400; 
+// var minSAT = 0; 
 
-var minACT = 0; 
-var maxACT = 36; 
+// var minACT = 0; 
+// var maxACT = 36; 
 
 //why is this reversing here
 //also these colors really ugly lol i just chose a random palette 
@@ -347,7 +347,7 @@ d3.csv('./colleges.csv',
                             filterList.push(d)
                         } 
                     };
-                    return d.ACT >= maxACT || d.ACT <= minACT 
+                    return d.ACT > maxACT || d.ACT < minACT 
             })
             .style("fill", "#c6c6c6");
 
@@ -391,12 +391,12 @@ d3.csv('./colleges.csv',
             
             var testing = hist.selectAll('.rect')
                 .filter(function(d) {
-                    if(d.SAT >= maxSAT || d.SAT <= minSAT) {
+                    if(d.SAT > maxSAT || d.SAT < minSAT) {
                         if (!filterList.includes(d)) {
                             filterList.push(d)
                         }
                     }
-                    return d.SAT >= maxSAT || d.SAT <= minSAT;
+                    return d.SAT > maxSAT || d.SAT < minSAT;
             })
             .style("fill", "#c6c6c6");
             console.log(filterList); 
