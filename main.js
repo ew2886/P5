@@ -70,8 +70,13 @@ var tip = d3.tip()
     .attr('class', 'd3-tip')
     .offset([-8, 0])
     .html(function(d) {
-      return d["name"];
-    });
+        return "<div><b>Name:  </b>" + d["name"] + "</div>"
+            + "<div>Region:  " + d["region"] + "</div>"
+            + "<div>Admission Rate:  " + d["admission"] + "</div>"
+            + "<div>ACT:  " + d["ACT"] + "</div>"
+            + "<div>SAT:  " + d["SAT"] + "</div>"
+            + "<div>Average Cost:  " + d["cost"] + "</div>";
+        });
 
 svg.call(tip);
 
@@ -88,19 +93,33 @@ d3.csv('./colleges.csv',
             admission: +d['Admission Rate'],
             ACT: +d['ACT Median'],
             SAT: +d['SAT Average'],
-            region: d.Region,
-            locale: d.Locale,
-            control: d.Control,
             cost: +d['Average Cost'],
             salary: +d['Median Earnings 8 years After Entry'],
+            // needed for on click 
             debt: +d['Median Debt on Graduation'],
+            locale: d.Locale,
+            control: d.Control,
+            region: d.Region,
+            population: +d['Undergrad Population'],
+            percent_white: +d['% White'],
+            percent_black: +d['% Black'],
+            percent_hispanic: +d['% Hispanic'],
+            percent_asian: +d['% Asian'],
+            percent_amer_indian: +d['% American Indian'],
+            percent_pacific_islander: +d['% Pacific Islander'],
+            percent_biracial: +d['% Biracial'],
+            percent_aliens: +d['% Nonresident Aliens'],
         }
     },
+
 
     function(error, dataset){
         if(error) {
             return;
         }
+        // Testing sht 
+        var headerNames = d3.keys(dataset[0])
+        console.log(headerNames)
 
         xHistScale = d3.scaleLinear()
             .range([0, chartWidth * .4])
@@ -263,8 +282,6 @@ d3.csv('./colleges.csv',
         var regions = d3.map(stats, function(d) {
             return d.region;
         }).keys();
-        var ACTscores = [[15, 17], [18, 20], [21, 23], [24, 26], [26, 28], [28, 29],[30, 31], [32, 34]];
-        var SATscores = [[700, 800], [801, 900], [901, 1000], [1001, 1100], [1101, 1200], [1201, 130], [1301, 1400], [1401, 1500], [1501, 1600]];
         var minACT; 
         var maxACT;
         var minSAT;
@@ -327,7 +344,7 @@ d3.csv('./colleges.csv',
             })
             .style("fill", "gray");
         });
-        d3.select("#reset").on("click", function(d) {
+        reset = d3.select("#reset").on("click", function() {
             hist.selectAll('.rect')
                 .style("fill", function(d) {
                     return colorScale(d.salary);
@@ -335,12 +352,6 @@ d3.csv('./colleges.csv',
         });
 
     });
-
-
-function dropdownChange() {
-    console.log("dropdown");
-    console.log(d3.select(this).attr("minValue"));
-}
 
 //function updateChart(SATRange, ACTRange, regions, sizeRange, costRange) {
 var bins;
@@ -434,36 +445,44 @@ function updateChart() {
         .attr("name", function(d) { return d['name']})
         .on("mouseover", function(d) {
             //color(this);
-            d3.select(this).style("fill", "#90EE90"); //change this color eventually 
-
+            d3.select(this).style("fill", "#90EE90"); //change this color eventually ?? light green atm 
             tip.show(d);
-        
-            d3.select("#sName").text(d['name']);
-            d3.select("#sRegion").text(d['region']);
-            d3.select("#sAdmiss").text(d['admission']);
-            d3.select("#sACT").text(d['ACT']);
-            d3.select("#sSAT").text(d['SAT']);
-            d3.select("#sCost").text(d['cost']);
-
         })					
         .on("mouseout", function(d) {
             tip.hide(d);
-            //uncolor(this);
-            d3.select(this).style("fill", function (d) { return colorScale(d['salary']); }); 
-            
-            //probably bad practice here?
-            // d3.select("#sName").text("").append("tspan");
-            // d3.select("#sRegion").text("").append("tspan");
-            // d3.select("#sAdmiss").text("").append("tspan");
-            // d3.select("#sACT").text("").append("tspan");
-            // d3.select("#sSAT").text("").append("tspan");
-            // d3.select("#sCost").text("").append("tspan");
+            d3.select(this).style("fill", function (d) { return colorScale(d['salary']); });
+            //uncolor(this) here? i think we should re color all during mouse over;
         })
         .on("click", function(d) {
-            console.log(d['name']); 
-            d3.select(".infobox").style('visibility', 'visible');
+            d3.select(this).style("fill", "#90EE90");
+            
+            d3.select("#sName").text(d['name']); 
+            d3.select("#sDebt").text(d['debt']);
+            d3.select("#sRegion").text(d['region']); 
+            d3.select("#sLocale").text(d['locale']);
+            d3.select("#sControl").text(d['control']);
+
+            d3.select("#sCost").text(d['cost']); 
+            d3.select("#sAdmission").text(d['admission']);
+            d3.select("#sACT").text(d['ACT']);
+            d3.select("#sSAT").text(d['SAT']);
+
+            // d3.select(".infobox").style('visibility', 'visible');
+
+            // d3.select("#sPopulation").text(d['cost']); //not working atm 
+            // d3.select("#sPercent_white").text(d['percent_white']);
+            // d3.select("#sPercent_black").text(d['percent_black']);
+            // d3.select("#sPercent_hispanic").text(d['percent_hispanic']);
+            // d3.select("#sPercent_asian").text(d['percent_asian']);
+            // d3.select("#sPercent_amer_indian").text(d['percent_amer_indian']);
+            // d3.select("#sPercent_pacific_islander").text(d['percent_pacific_islander']);
+            // d3.select("#sPercent_biracial").text(d['percent_biracial']);
+            // d3.select("#sPercent_aliens").text(d['percent_aliens']);
+
         });
 }
+
+
 
 colorRects = [];
 var squares; 
