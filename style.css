@@ -170,3 +170,18 @@ path.domain {
     margin-top: 16px;
     margin-left: 16px;
 }
+
+textarea {
+    resize: none;
+}
+
+input,
+textarea {
+    background: none;
+    font-size: 12px;
+    padding: 10px 10px 10px 5px;
+    display: block;
+    border: none;
+    border-radius: 0;
+    border-bottom: 1px solid;
+}

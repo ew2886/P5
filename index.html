@@ -3,6 +3,9 @@
 
 <head>
     <meta charset="UTF-8" />
+
+    <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link href="style.css" type="text/css" rel="stylesheet" />
     <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -51,29 +54,53 @@
                         </div>
                     </div>
                     <div class="card">
-                        <div id="act">
-                            <b> Filter by ACT Scores: </b>
-                            <div id="minACT"> <b> Minimum score: </b></div>
-                            <div id="maxACT"> <b> Maximum score: </b></div>
-                            <div>
-                                <button id="filterACT"> Filter </button>
+                        <div class="infobox" width="100vw">
+                            <h2 class="cardh2" id="sName">Filter</h2>
+                            <hr class="bar" />
+                            <div class="card-content">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col left col-sm-6">
+                                            <div id="act">
+                                                <h5>
+                                                    <div> Filter by ACT Scores:</div> <br/>
+                                                </h5>
+                                                <div id="minACT"> <b> Minimum score: </b></div> <br/>
+                                                <div id="maxACT"> <b> Maximum score: </b></div> <br/>
+                                                <div>
+                                                    <button type="button" class="btn btn-outline-primary btn-sm filterButton" id="filterACT"> Filter ACT </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col right col-sm-6">
+                                            <div>
+                                                <h5>
+                                                    <div>Filter by SAT Scores:</div> <br/>
+                                                </h5>
+                                                <div id="minSAT"> <b> Minimum score: </b></div> <br/>
+                                                <div id="maxSAT"> <b> Maximum score: </b></div><br/>
+                                                <div>
+                                                    <button type="button" class="btn btn-outline-primary btn-sm filterButton" id="filterSAT"> Filter SAT </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <br/>
+                                    <div class="row">
+                                        <div style="padding-left: 15px; padding-bottom:15px">
+                                            <button type="button" class="btn btn-outline-danger btn-sm" id="reset">Reset Filters</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
                             </div>
-                        </div>
-                        <div>
-                            <b> Filter by SAT Scores: </b>
-                            <div id="minSAT"> <b> Minimum score: </b></div>
-                            <div id="maxSAT"> <b> Maximum score: </b></div>
-                            <div>
-                                <button id="filterSAT"> Filter </button>
-                            </div>
-                        </div>
-                        <div>
-                            <button id="reset">Reset Filters</button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
     </body>
     <!-- for some reason this script tag cant be removed -->

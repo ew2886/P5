@@ -317,6 +317,10 @@ d3.csv('./colleges.csv',
         d3.select("#filterACT").on("click", function(d) {
 
             d3.selectAll(".inputFields").property("disabled", true); 
+            d3.selectAll(".filterButton")
+                .property("disabled", true)
+                .attr('class', 'btn btn-outline-secondary btn-sm filterButton'); 
+
 
             hist.selectAll('.rect')
                 .filter(function (d) {
@@ -369,6 +373,8 @@ d3.csv('./colleges.csv',
         d3.select("#filterSAT").on("click", function(d) {
 
             d3.selectAll(".inputFields").property("disabled", true); 
+            d3.selectAll(".filterButton").property("disabled", true)
+                .attr('class', 'btn btn-outline-secondary btn-sm filterButton'); 
 
             hist.selectAll('.rect')
                 .filter(function (d) {
@@ -397,6 +403,10 @@ d3.csv('./colleges.csv',
         });
         reset = d3.select("#reset").on("click", function() {
             d3.selectAll(".inputFields").property("disabled", false); 
+            d3.selectAll(".filterButton")
+                .property("disabled", false) 
+                .attr('class', 'btn btn-outline-primary btn-sm filterButton'); 
+
 
             filterList = []; 
             console.log(filterList)
