@@ -17,6 +17,8 @@ var colors = ["gray", '#996600', '#660066', "#003300", '#003366', '#C8C8C8', '#0
 
 var binContainer = []; 
 
+var filterList = []
+
 var svg = d3.select('#svg1');
 
 var svgWidth = 3000;
@@ -35,6 +37,12 @@ var regionDropdown;
 var actDropdown;
 var satDropdown;
 var legendPlace;
+
+var maxSAT = 2400; 
+var minSAT = 0; 
+
+var minACT = 0; 
+var maxACT = 36; 
 
 //why is this reversing here
 //also these colors really ugly lol i just chose a random palette 
@@ -295,42 +303,113 @@ d3.csv('./colleges.csv',
         d3.select("#minACT")
             .append('input')
             .attr('type', 'number')
+            .attr('class', 'inputFields')
             .on('input', function() {
                 minACT = this.value;
             })
         d3.select("#maxACT")
             .append('input')
             .attr('type', 'number')
+            .attr('class', "inputFields")
             .on('input', function() {
                 maxACT = this.value; 
             })
         d3.select("#filterACT").on("click", function(d) {
+
+            d3.selectAll(".inputFields").property("disabled", true); 
+            d3.selectAll(".filterButton")
+                .property("disabled", true)
+                .attr('class', 'btn btn-outline-secondary btn-sm filterButton'); 
+
+
+            hist.selectAll('.rect')
+                .filter(function (d) {
+                    // if (!(d.ACT >= maxACT || d.ACT <= minACT)) {
+                    //     //if in filter list than it was greyed by SAT already and should remain there even if it satisfies the ACT req 
+                    //     // if (filterList.includes(d)) {
+                    //     //     return false
+                    //     // } 
+                    // }
+                    return !(d.ACT > maxACT || d.ACT < minACT)
+                })
+                .style("fill", function (d) {
+                    return colorScale(d.salary);
+                });
+
+
+            console.log(filterList)
+            //now greying out those that are not in range 
             var testing = hist.selectAll('.rect')
                 .filter(function(d) {
-                    return d.ACT >= maxACT || d.ACT <= minACT;
+                    if(d.ACT > maxACT || d.ACT < minACT) { 
+                        // if its not in filtered list add it 
+                        if (!filterList.includes(d)) {
+                            filterList.push(d)
+                        } 
+                    };
+                    return d.ACT >= maxACT || d.ACT <= minACT 
             })
-            .style("fill", "gray");
+            .style("fill", "#c6c6c6");
+
+            console.log(filterList)
+
+            //first recolor those that are in range on ACT for sure and maybe SAT 
+           
         });
         d3.select("#minSAT")
             .append('input')
             .attr('type', 'number')
+            .attr('class', "inputFields")
             .on('input', function() {
                 minSAT = this.value;
             })
         d3.select("#maxSAT")
             .append('input')
             .attr('type', 'number')
+            .attr('class',"inputFields")
             .on('input', function() {
                 maxSAT = this.value; 
             })
         d3.select("#filterSAT").on("click", function(d) {
+
+            d3.selectAll(".inputFields").property("disabled", true); 
+            d3.selectAll(".filterButton").property("disabled", true)
+                .attr('class', 'btn btn-outline-secondary btn-sm filterButton'); 
+
+            hist.selectAll('.rect')
+                .filter(function (d) {
+                    // if (!(d.SAT >= maxSAT || d.SAT <= minSAT)) {
+                    //     if (filterList.includes(d)) { 
+                    //         return false 
+                    //     }
+                    // }
+                    return !(d.SAT > maxSAT || d.SAT < minSAT)
+                })
+                .style("fill", function (d) {
+                    return colorScale(d.salary);
+                }); 
+            
             var testing = hist.selectAll('.rect')
                 .filter(function(d) {
+                    if(d.SAT >= maxSAT || d.SAT <= minSAT) {
+                        if (!filterList.includes(d)) {
+                            filterList.push(d)
+                        }
+                    }
                     return d.SAT >= maxSAT || d.SAT <= minSAT;
             })
-            .style("fill", "gray");
+            .style("fill", "#c6c6c6");
+            console.log(filterList); 
         });
         reset = d3.select("#reset").on("click", function() {
+            d3.selectAll(".inputFields").property("disabled", false); 
+            d3.selectAll(".filterButton")
+                .property("disabled", false) 
+                .attr('class', 'btn btn-outline-primary btn-sm filterButton'); 
+
+
+            filterList = []; 
+            console.log(filterList)
             hist.selectAll('.rect')
                 .style("fill", function(d) {
                     return colorScale(d.salary);
@@ -431,12 +510,28 @@ function updateChart() {
         .attr("name", function(d) { return d['name']})
         .on("mouseover", function(d) {
             //color(this);
+            if (d3.select(this).attr("opacity") == 1) {
+                tip.show(d);
+            }
             d3.select(this).style("fill", "#90EE90"); //change this color eventually ?? light green atm 
-            tip.show(d);
+
         })					
         .on("mouseout", function(d) {
             tip.hide(d);
-            d3.select(this).style("fill", function (d) { return colorScale(d['salary']); });
+            d3.select(this).style("fill", function (d) { 
+                console.log(d)
+                var greyOut = false; 
+                filterList.forEach(element => {
+                    if (element['name'] == d["name"]) {
+                        greyOut = true; 
+                    } 
+                }); 
+                if (greyOut) { 
+                    return "#c6c6c6"; 
+                }
+                return colorScale(d['salary']); 
+
+            });
             //uncolor(this) here? i think we should re color all during mouse over;
         })
         .on("click", function(d) {
@@ -502,8 +597,8 @@ function plotSingle(d) {
 
             d3.select(this)
             .transition()
-            .duration(1000)
-            .delay(750)
+            .duration(2000)
+            .delay(500)
             .attr("y", (currMinHeight + orig_y).toString());
         })
 } 
@@ -515,7 +610,8 @@ function restorePlot(d) {
             var ogY = d3.select(this).attr("ogY");
             d3.select(this)
             .transition()
-            .duration(1000)
+            .duration(2000)
+            .delay(750)
             .attr("y", ogY);
     })
     //restore opacity of erased bars
@@ -525,8 +621,8 @@ function restorePlot(d) {
             //hist.selectAll(".rect" + legendClassArray[i])
             hist.selectAll("[color= '" + legendClassArray[i] + "']")
             .transition()
-            .duration(1000)
-            .delay(750)
+            .duration(500)
+            .delay(1500)
             .attr("opacity", 1)        
             .style("opacity", 1);
         }
